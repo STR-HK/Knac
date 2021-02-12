@@ -1,10 +1,14 @@
-from PyQt5.QtCore import QDateTime, Qt, QTimer
+from PyQt5.QtCore import QDateTime, Qt, QTimer, QSize
 from PyQt5.QtWidgets import (QApplication, QCheckBox, QComboBox, QDateTimeEdit,
         QDial, QDialog, QGridLayout, QGroupBox, QHBoxLayout, QLabel, QLineEdit,
         QProgressBar, QPushButton, QRadioButton, QScrollBar, QSizePolicy,
         QSlider, QSpinBox, QStyleFactory, QTableWidget, QTabWidget, QTextEdit,
-        QVBoxLayout, QWidget, QMessageBox, QStackedWidget, QStatusBar, QDesktopWidget)
-from PyQt5.QtGui import QIcon, QColor, QPainter, QFontDatabase, QFont, QPixmap
+        QVBoxLayout, QWidget, QMessageBox, QStackedWidget, QStatusBar, QDesktopWidget,
+        QMainWindow, QMenuBar, QAction, QMenu)
+
+from PyQt5.QtGui import (QIcon, QColor, QPainter, QFontDatabase, QFont,
+        QPixmap, QCursor)
+
 from PyQt5 import QtCore
 
 from os import path
@@ -16,6 +20,7 @@ import Hangul
 class MainWindow(QWidget):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
+        self.blockColor = 'white'
 
         self.setWindowTitle('Korean Name Compatibility Checker GUI')
         self.iconfilename = u'./icons/{}'.format('NK.png')
@@ -31,26 +36,57 @@ class MainWindow(QWidget):
         self.layout = QVBoxLayout(self)
 
         self.QTabs = QTabWidget()
-
         self.QTab1 = QWidget()
         self.QTab2 = QWidget()
         self.QTab3 = QWidget()
+        self.QGithub = QWidget()
+        self.QDev = QWidget()
+
 
         self.QTabs.addTab(self.QTab1, "𝟏 by 𝟏")
         self.QTabs.addTab(self.QTab2, "𝟏 by 𝒏")
         self.QTabs.addTab(self.QTab3, "𝒏 by 𝒏")
+        self.QTabs.addTab(self.QGithub, "𝐈𝐧𝐟𝐨")
+        self.QTabs.addTab(self.QDev, "𝕯𝖊𝖛")
         
         self.layout.addWidget(self.QTabs)
         self.setLayout(self.layout)
 
-        self.statusBar = QStatusBar()
-        self.b = QPushButton("click here")
-
+        self.Dev()
         self.Tab1()
+
+    def Info(self):
+        print('Info')
+
+    def Dev(self):
+        
+        self.Devlayout = QGridLayout(self)
+        self.Devlayout.setAlignment(Qt.AlignTop)
+
+        self.blockColorText = QLabel('Tab1 Block Color : ' + str(self.blockColor))
+        self.blockColorText.setStyleSheet('background-color: white;')
+        self.blockColorInputBox = QLineEdit()
+        self.blockColorInputBox.setStyleSheet("padding-left: 2px;")
+        self.blockColorInputBox.setPlaceholderText("Block Color")
+        self.blockColorButton = QPushButton('Apply', self)
+        self.blockColorButton.clicked.connect(self.blockColorFunc)
+       
+        self.Devlayout.addWidget(self.blockColorText, 0, 1, 1, 4)
+        self.Devlayout.addWidget(self.blockColorInputBox, 1, 1, 1, 3)
+        self.Devlayout.addWidget(self.blockColorButton, 1, 4, 1, 1)
+
+        self.QDev.setLayout(self.Devlayout)
+
+
+    def blockColorFunc(self):
+        self.blockColor = self.blockColorInputBox.text()
+        self.blockColorText = QLabel('Tab1 Block Color : ' + str(self.blockColor))
+        self.blockColorText.setStyleSheet('background-color: white;')
+        self.Devlayout.addWidget(self.blockColorText, 0, 1, 1, 4)
+        self.QDev.setLayout(self.Devlayout)
 
 
     def Tab1(self):
-        self.blockColor = 'white'
 
         self.Tab1layout = QGridLayout(self)
         self.Tab1layout.setAlignment(Qt.AlignTop)
@@ -189,7 +225,7 @@ class MainWindow(QWidget):
         self.Tab1TreeLayer2.addWidget(self.Tab1TreeLayer2Text5, 0, 4)
         self.Tab1TreeLayer2.addWidget(self.Tab1TreeLayer2Text6, 0, 5)
         self.Tab1Tree.addLayout(self.Tab1TreeLayer2, 1, 0)
-        self.Tab1layout.addLayout(self.Tab1Tree, 5, 0, 1, 2)
+        self.Tab1layout.addLayout(self.Tab1Tree, 4, 0, 1, 2)
         self.QTab1.setLayout(self.Tab1layout)
 
         self.Name1and2 = []
@@ -251,7 +287,7 @@ class MainWindow(QWidget):
         self.Tab1TreeLayer3.addWidget(self.Tab1TreeLayer3Text55, 0, 17, 1, 2)
 
         self.Tab1Tree.addLayout(self.Tab1TreeLayer3, 2, 0)
-        self.Tab1layout.addLayout(self.Tab1Tree, 7, 0, 1, 2)
+        self.Tab1layout.addLayout(self.Tab1Tree, 5, 0, 1, 2)
         self.QTab1.setLayout(self.Tab1layout)
 
         self.Name4List = []
@@ -288,7 +324,7 @@ class MainWindow(QWidget):
         self.Tab1TreeLayer4.addWidget(self.Tab1TreeLayer4Text5, 0, 6)
 
         self.Tab1Tree.addLayout(self.Tab1TreeLayer4, 3, 0)
-        self.Tab1layout.addLayout(self.Tab1Tree, 9, 0, 1, 2)
+        self.Tab1layout.addLayout(self.Tab1Tree, 6, 0, 1, 2)
         self.QTab1.setLayout(self.Tab1layout)
 
         self.Name5List = []
@@ -329,7 +365,7 @@ class MainWindow(QWidget):
         self.Tab1TreeLayer5.addWidget(self.Tab1TreeLayer5Text6, 0, 7)
 
         self.Tab1Tree.addLayout(self.Tab1TreeLayer5, 4, 0)
-        self.Tab1layout.addLayout(self.Tab1Tree, 11, 0, 1, 2)
+        self.Tab1layout.addLayout(self.Tab1Tree, 7, 0, 1, 2)
         self.QTab1.setLayout(self.Tab1layout)
 
         self.Name6List = []
@@ -362,8 +398,10 @@ class MainWindow(QWidget):
         self.Tab1TreeLayer6.addWidget(self.Tab1TreeLayer6Text4, 0, 6, 1, 1)
 
         self.Tab1Tree.addLayout(self.Tab1TreeLayer6, 5, 0)
-        self.Tab1layout.addLayout(self.Tab1Tree, 13, 0, 1, 2)
+        self.Tab1layout.addLayout(self.Tab1Tree, 8, 0, 1, 2)
         self.QTab1.setLayout(self.Tab1layout)
+
+
 
 
 if __name__ == '__main__':
@@ -372,8 +410,13 @@ if __name__ == '__main__':
 
     fontDB = QFontDatabase()
     fontDB.addApplicationFont(path.abspath(path.join(path.dirname(__file__), 'fonts/SDGothicNeoM.ttf')))
-    app.setFont(QFont('AppleSDGothicNeoM00', 10))
+    app.setFont(QFont('AppleSDGothicNeoM00', 11))
 
     window = MainWindow()
+
+    #palatte = window.palette()
+    #palatte.setColor(window.backgroundRole(), Qt.white)
+    #window.setPalette(palatte)
+
     window.show()
     sys.exit(app.exec())
