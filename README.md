@@ -1,2 +1,2 @@
-# Korean Name Compatibility Checker GUI
 # Knac
+## Korean Name Compatibility Checker GUI
