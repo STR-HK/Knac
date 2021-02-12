@@ -53,10 +53,26 @@ class MainWindow(QWidget):
         self.setLayout(self.layout)
 
         self.Dev()
+        self.Info()
         self.Tab1()
 
     def Info(self):
-        print('Info')
+        self.Infolayout = QGridLayout(self)
+        self.Infolayout.setAlignment(Qt.AlignTop)
+        # self.Infolayout.setAlignment(Qt.AlignHCenter | Qt.AlignTop)
+
+        self.octocat = QLabel(self)
+        self.octocat.setScaledContents(True)
+        self.octocat.setPixmap(QPixmap('./icons/github.png'))
+        self.octocat.setFixedSize(64, 64)
+
+        self.sourceLink = QLabel('  Source Code : <a href="https://github.com/STR-HK/Knac">Repository Link</a>')
+        self.sourceLink.setOpenExternalLinks(True)
+
+        self.Infolayout.addWidget(self.octocat, 0, 1, 1, 1)
+        self.Infolayout.addWidget(self.sourceLink, 0, 2, 1, 2)
+        self.QGithub.setLayout(self.Infolayout)
+
 
     def Dev(self):
         
