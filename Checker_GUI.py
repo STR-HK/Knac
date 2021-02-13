@@ -4,7 +4,8 @@ from PyQt5.QtWidgets import (QApplication, QCheckBox, QComboBox, QDateTimeEdit,
         QProgressBar, QPushButton, QRadioButton, QScrollBar, QSizePolicy,
         QSlider, QSpinBox, QStyleFactory, QTableWidget, QTabWidget, QTextEdit,
         QVBoxLayout, QWidget, QMessageBox, QStackedWidget, QStatusBar, QDesktopWidget,
-        QMainWindow, QMenuBar, QAction, QMenu)
+        QMainWindow, QMenuBar, QAction, QMenu, QListWidget, QListWidgetItem, QInputDialog,
+        QFileDialog, QTableWidgetItem)
 
 from PyQt5.QtGui import (QIcon, QColor, QPainter, QFontDatabase, QFont,
         QPixmap, QCursor)
@@ -55,6 +56,7 @@ class MainWindow(QWidget):
         self.Dev()
         self.Info()
         self.Tab1()
+        self.Tab2()
 
     def Info(self):
         self.Infolayout = QGridLayout(self)
@@ -103,7 +105,6 @@ class MainWindow(QWidget):
 
 
     def Tab1(self):
-
         self.Tab1layout = QGridLayout(self)
         self.Tab1layout.setAlignment(Qt.AlignTop)
 
@@ -416,6 +417,224 @@ class MainWindow(QWidget):
         self.Tab1Tree.addLayout(self.Tab1TreeLayer6, 5, 0)
         self.Tab1layout.addLayout(self.Tab1Tree, 8, 0, 1, 2)
         self.QTab1.setLayout(self.Tab1layout)
+
+    def Tab2(self):
+        self.Tab2layout = QGridLayout(self)
+        self.Tab2layout.setAlignment(Qt.AlignTop)
+
+        self.Tab2TXTButton = QPushButton()
+        self.Tab2TXTButton.setText('TXT')
+        self.Tab2TXTButton.setFixedHeight(20)
+        self.Tab2TXTButton.clicked.connect(self.Tab2TXTClick)
+        
+        self.Tab2CSVButton = QPushButton()
+        self.Tab2CSVButton.setText('CSV')
+        self.Tab2CSVButton.setFixedHeight(20)
+        self.Tab2CSVButton.clicked.connect(self.Tab2CSVClick)
+
+        self.Tab2AddButton = QPushButton()
+        self.Tab2AddButton.setText('+')
+        self.Tab2AddButton.setFixedHeight(20)
+        self.Tab2AddButton.clicked.connect(self.Tab2AddClick)
+
+        self.Tab2RemoveButton = QPushButton()
+        self.Tab2RemoveButton.setText('-')
+        self.Tab2RemoveButton.setFixedHeight(20)
+        self.Tab2RemoveButton.clicked.connect(self.Tab2RemoveClick)
+
+        self.Tab2input1 = QLineEdit()
+        self.Tab2input1.setAlignment(QtCore.Qt.AlignCenter)
+        self.Tab2input1.setPlaceholderText("NAME 1")
+        self.Tab2input1.setFixedHeight(40)
+
+        self.Tab2input2 = QListWidget()
+        self.Tab2input2.setFixedHeight(128)
+
+        self.Tab2analysisButton = QPushButton('Analysis')
+        self.Tab2analysisButton.setFixedHeight(32)
+        self.Tab2analysisButton.clicked.connect(self.Tab2ButtonClick)
+
+        self.Tab2Blank = QLabel('\n')
+
+        self.Tab2Tree = QGridLayout(self)
+        self.Tab2Tree.setAlignment(Qt.AlignTop)
+
+        self.Tab2layout.addWidget(self.Tab2TXTButton, 0, 0, 1, 1)
+        self.Tab2layout.addWidget(self.Tab2CSVButton, 0, 1, 1, 1)
+        self.Tab2layout.addWidget(self.Tab2AddButton, 0, 2, 1, 1)
+        self.Tab2layout.addWidget(self.Tab2RemoveButton, 0, 3, 1, 1)
+
+        self.Tab2layout.addWidget(self.Tab2input1, 1, 0, 1, 2)
+        self.Tab2layout.addWidget(self.Tab2input2, 1, 2, 1, 2)
+        self.Tab2layout.addWidget(self.Tab2analysisButton, 2, 0, 1, 4)
+        self.Tab2layout.addWidget(self.Tab2Blank, 3, 0, 1, 4)
+
+        # 최종 반영
+        self.QTab2.setLayout(self.Tab2layout)
+
+    def Tab2TXTClick(self):
+        self.loadTXT = QFileDialog()
+        self.loadTXT.setFileMode(QFileDialog.AnyFile)
+        self.loadTXTfilename = self.loadTXT.getOpenFileName(
+            caption='Open TXT file', filter="Text files (*.txt)")
+
+        if self.loadTXTfilename:
+            if self.loadTXTfilename[0] == '':
+                return
+            
+            f = open(self.loadTXTfilename[0], 'r',  encoding='utf-8')
+            self.loadTXTList = f.read().split('\n')
+
+            for x in range(len(self.loadTXTList)):
+                self.loadTXTtoClear = ''.join(re.compile('[가-힣]+').findall(self.loadTXTList[x]))
+                if (len(self.loadTXTList[x]) == 2 or len(self.loadTXTList[x]) == 3):
+                    if (len(self.loadTXTtoClear) == 2 or len(self.loadTXTtoClear) == 3):
+                        self.Tab2AddItem = QListWidgetItem(self.loadTXTtoClear)
+                        self.Tab2AddItem.setTextAlignment(Qt.AlignCenter)
+                        self.Tab2AddItem.setSizeHint(QSize(0, 25))
+                        self.Tab2input2.addItem(self.Tab2AddItem)
+
+            self.Tab2layout.addWidget(self.Tab2input2, 1, 2, 1, 2)
+            self.QTab2.setLayout(self.Tab2layout)
+
+
+    def Tab2CSVClick(self):
+        self.loadTXT = QFileDialog()
+        self.loadTXT.setFileMode(QFileDialog.AnyFile)
+        self.loadTXTfilename = self.loadTXT.getOpenFileName(
+            caption='Open CSV file', filter="Comma-Separated Values (*.csv)")
+
+        if self.loadTXTfilename:
+            if self.loadTXTfilename[0] == '':
+                return
+            
+            f = open(self.loadTXTfilename[0], 'r',  encoding='utf-8')
+            self.loadTXTList = f.read().split('\n')
+
+            for x in range(len(self.loadTXTList)):
+                self.loadTXTtoClear = ''.join(re.compile('[가-힣]+').findall(self.loadTXTList[x]))
+                if (len(self.loadTXTList[x]) == 2 or len(self.loadTXTList[x]) == 3):
+                    if (len(self.loadTXTtoClear) == 2 or len(self.loadTXTtoClear) == 3):
+                        self.Tab2AddItem = QListWidgetItem(self.loadTXTtoClear)
+                        self.Tab2AddItem.setTextAlignment(Qt.AlignCenter)
+                        self.Tab2AddItem.setSizeHint(QSize(0, 25))
+                        self.Tab2input2.addItem(self.Tab2AddItem)
+
+            self.Tab2layout.addWidget(self.Tab2input2, 1, 2, 1, 2)
+            self.QTab2.setLayout(self.Tab2layout)
+
+    def Tab2AddClick(self):
+        text, ok = QInputDialog.getText(self, 'Add Dialog', 'Enter text:')
+        if (ok):
+            self.Tab2name2AddtoList = []
+            self.Tab2name2AddtoList = re.compile('[가-힣]+').findall(str(text))
+            self.Tab2name2Add = ''
+            self.Tab2name2Add = self.Tab2name2Add.join(self.Tab2name2AddtoList)
+
+            if (len(str(text)) == 2 or len(str(text)) == 3):
+                if (len(self.Tab2name2Add) == 2 or len(self.Tab2name2Add) == 3):
+                    self.Tab2AddItem = QListWidgetItem(self.Tab2name2Add)
+                    self.Tab2AddItem.setTextAlignment(Qt.AlignCenter)
+                    self.Tab2AddItem.setSizeHint(QSize(0, 25))
+                    self.Tab2input2.addItem(self.Tab2AddItem)
+                    self.Tab2layout.addWidget(self.Tab2input2, 1, 2, 1, 2)
+                    self.QTab2.setLayout(self.Tab2layout)
+                    return
+
+    def Tab2RemoveClick(self):
+        listItems = self.Tab2input2.selectedItems()
+        if not listItems: return
+        for item in listItems:
+            self.Tab2input2.takeItem(self.Tab2input2.row(item))
+    
+    def Tab2ButtonClick(self):
+        self.Tab2input1Text = ''.join(re.compile('[가-힣]+').findall(self.Tab2input1.text()))
+        self.Tab2input2itemsList = self.Tab2input2.findItems("", Qt.MatchContains)
+        
+        if (len(self.Tab2input1Text) == 2 or len(self.Tab2input1Text) == 3):
+            if (len(self.Tab2input1.text()) == 2 or len(self.Tab2input1.text()) == 3):
+                if (len(self.Tab2input2itemsList) != 0):
+
+                    self.Tab2Analyser(self.Tab2input1Text, self.Tab2input2itemsList)
+                    return
+
+        # 잘못된 입력
+        self.alert = QMessageBox()
+        self.alert.setIcon(QMessageBox.Critical)
+        self.alert.setWindowTitle('Invalid Input')
+        self.alert.setWindowIcon(QIcon('icons/name.png'))
+        self.alert.setText('Invalid Input. Please Retry.\nCondition : KR 2 or 3 Letter')
+        self.alert.setStandardButtons(QMessageBox.Retry)
+        self.alert.setDefaultButton(QMessageBox.Retry)
+        self.ret = self.alert.exec_()
+
+    def Tab2Analyser(self, Name1, Names2):
+        self.Tab2NAME1col = []
+        self.Tab2NAME2col = []
+        self.Tab2RESULTcol = []
+        
+        # 모든 아이템을 가져와 글자로 변환
+        for j in range(len(Names2)):
+            Names2[j] = Names2[j].text()
+
+        # 2글자 처리
+        for k in range(len(Names2)):
+            if (len(Names2[k]) == 2):
+                Names2[k] = Names2[k] + '○'
+
+        for l in range(len(Names2)):
+            self.Name1toList = []
+            self.Name2toList = []
+
+            for a in range(3):
+                self.Name1toList.append(Name1[a])
+                self.Name1toList[a] = Hangul.gyeopjamo(Hangul.jamo(self.Name1toList[a]))
+                self.Name1toList[a] = Hangul.convertonumber(''.join(self.Name1toList[a]))
+            for b in range(3):
+                self.Name2toList.append(Names2[l][b])
+                self.Name2toList[b] = Hangul.gyeopjamo(Hangul.jamo(self.Name2toList[b]))
+                self.Name2toList[b] = Hangul.convertonumber(''.join(self.Name2toList[b]))
+
+            self.Name1and2 = []
+            for w in range(3):
+                self.Name1and2.append(self.Name1toList[w])
+                self.Name1and2.append(self.Name2toList[w])
+
+            self.Name3List = []
+            for x in range(5):
+                self.Name3List.append(int(str((self.Name1and2[x] + self.Name1and2[x+1]))[-1]))
+
+            self.Name4List = []
+            for u in range(4):
+                self.Name4List.append(int(str((self.Name3List[u] + self.Name3List[u+1]))[-1]))
+
+            self.Name5List = []
+            for v in range(3):
+                self.Name5List.append(int(str((self.Name4List[v] + self.Name4List[v+1]))[-1]))
+
+            self.Name6List = []
+            for k in range(2):
+                self.Name6List.append(int(str((self.Name5List[k] + self.Name5List[k+1]))[-1]))
+
+            self.Tab2NAME1col.append(Name1)
+            self.Tab2NAME2col.append(Names2[l])
+            self.Tab2RESULTcol.append(str(self.Name6List[0]) + str(self.Name6List[1]) + '%')
+
+        self.Tab2table = QTableWidget()
+        self.Tab2table.setRowCount(len(Names2))
+        print(len(Names2))
+        self.Tab2table.setColumnCount(3)
+
+        for q in range(len(Names2)):
+            self.Tab2table.setItem(q, 0, QTableWidgetItem(self.Tab2NAME1col[q].replace('○','')))
+            self.Tab2table.setItem(q, 1, QTableWidgetItem(self.Tab2NAME2col[q].replace('○','')))
+            self.Tab2table.setItem(q, 2, QTableWidgetItem(self.Tab2RESULTcol[q].replace('○','')))
+
+        self.Tab2layout.addWidget(self.Tab2table, 4, 0, 1, 4)
+
+        # 최종 반영
+        self.QTab2.setLayout(self.Tab2layout)
+
 
 
 
