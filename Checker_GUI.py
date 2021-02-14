@@ -1,27 +1,32 @@
-from PyQt5.QtCore import QDateTime, Qt, QTimer, QSize
+from PyQt5.QtCore import QDateTime, Qt, QTimer, QSize, QTextStream, QFile
 from PyQt5.QtWidgets import (QApplication, QCheckBox, QComboBox, QDateTimeEdit,
         QDial, QDialog, QGridLayout, QGroupBox, QHBoxLayout, QLabel, QLineEdit,
         QProgressBar, QPushButton, QRadioButton, QScrollBar, QSizePolicy,
         QSlider, QSpinBox, QStyleFactory, QTableWidget, QTabWidget, QTextEdit,
         QVBoxLayout, QWidget, QMessageBox, QStackedWidget, QStatusBar, QDesktopWidget,
         QMainWindow, QMenuBar, QAction, QMenu, QListWidget, QListWidgetItem, QInputDialog,
-        QFileDialog, QTableWidgetItem)
+        QFileDialog, QTableWidgetItem, QHeaderView, QShortcut)
 
 from PyQt5.QtGui import (QIcon, QColor, QPainter, QFontDatabase, QFont,
-        QPixmap, QCursor)
+        QPixmap, QCursor, QKeySequence)
 
 from PyQt5 import QtCore
 
 from os import path
 import json
 import re
+import csv
 
 import Hangul
 
 class MainWindow(QWidget):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
+        # 다른곳에서 사용하는 변수 및 리스트 선언
         self.blockColor = 'white'
+        self.Tab2NAME1col = []
+        self.Tab2NAME2col = []
+        self.Tab2RESULTcol = []
 
         self.setWindowTitle('Korean Name Compatibility Checker GUI')
         self.iconfilename = u'./icons/{}'.format('NK.png')
@@ -53,10 +58,97 @@ class MainWindow(QWidget):
         self.layout.addWidget(self.QTabs)
         self.setLayout(self.layout)
 
+        self.ShortCut()
+
         self.Dev()
         self.Info()
         self.Tab1()
         self.Tab2()
+
+    def ShortCut(self):
+        self.SCexit = QShortcut(QKeySequence('Ctrl+W'), self)
+        self.SCexit.activated.connect(app.quit)
+        self.SCanal = QShortcut(QKeySequence('Ctrl+A'), self)
+        self.SCanal.activated.connect(self.analysis)
+        self.SCsave = QShortcut(QKeySequence('Ctrl+S'), self)
+        self.SCsave.activated.connect(self.save)
+
+        self.SCTab1 = QShortcut(QKeySequence('Ctrl+1'), self)
+        self.SCTab1.activated.connect(self.gotoTab1)
+        self.SCTab2 = QShortcut(QKeySequence('Ctrl+2'), self)
+        self.SCTab2.activated.connect(self.gotoTab2)
+        self.SCTab3 = QShortcut(QKeySequence('Ctrl+3'), self)
+        self.SCTab3.activated.connect(self.gotoTab3)
+        self.SCTab4 = QShortcut(QKeySequence('Ctrl+4'), self)
+        self.SCTab4.activated.connect(self.gotoTab4)
+        self.SCTab5 = QShortcut(QKeySequence('Ctrl+5'), self)
+        self.SCTab5.activated.connect(self.gotoTab5)
+        
+        self.SCTXT = QShortcut(QKeySequence('Ctrl+T'), self)
+        self.SCTXT.activated.connect(self.TXT)
+        self.SCSCV = QShortcut(QKeySequence('Ctrl+C'), self)
+        self.SCSCV.activated.connect(self.CSV)
+
+        self.SCADD = QShortcut(QKeySequence('Ctrl+P'), self)
+        self.SCADD.activated.connect(self.plus)
+
+        self.SCN1 = QShortcut(QKeySequence('Ctrl+N'), self)
+        self.SCN1.activated.connect(self.Name1)
+        self.SCN2 = QShortcut(QKeySequence('Ctrl+M'), self)
+        self.SCN2.activated.connect(self.Name2)
+
+    def Name1(self):
+        if (self.QTabs.currentIndex() == 0):
+            self.Tab1input1.setFocus()
+        elif (self.QTabs.currentIndex() == 1):
+            self.Tab2input1.setFocus()
+
+    def Name2(self):
+        if (self.QTabs.currentIndex() == 0):
+            self.Tab1input2.setFocus()
+
+    def save(self):
+        if (self.QTabs.currentIndex() == 1):
+            self.Tab2SaveAsCSV.click()
+        elif (self.QTabs.currentIndex() == 2):
+            print('탭3s')
+
+    def analysis(self):
+        if (self.QTabs.currentIndex() == 0):
+            self.Tab1analysisButton.click()
+        elif (self.QTabs.currentIndex() == 1):
+            self.Tab2analysisButton.click()
+        elif (self.QTabs.currentIndex() == 2):
+            print('탭3A')
+    
+    def plus(self):
+        if (self.QTabs.currentIndex() == 1):
+            self.Tab2AddButton.click()
+        elif (self.QTabs.currentIndex() == 2):
+            print('탭3P')
+
+    def gotoTab1(self):
+        self.QTabs.setCurrentIndex(0)
+    def gotoTab2(self):
+        self.QTabs.setCurrentIndex(1)
+    def gotoTab3(self):
+        self.QTabs.setCurrentIndex(2)
+    def gotoTab4(self):
+        self.QTabs.setCurrentIndex(3)
+    def gotoTab5(self):
+        self.QTabs.setCurrentIndex(4)
+
+    def TXT(self):
+        if (self.QTabs.currentIndex() == 1):
+            self.Tab2TXTButton.click()
+        elif (self.QTabs.currentIndex() == 2):
+            print('탭3T')
+    
+    def CSV(self):
+        if (self.QTabs.currentIndex() == 1):
+            self.Tab2CSVButton.click()
+        elif (self.QTabs.currentIndex() == 2):
+            print('탭3C')
 
     def Info(self):
         self.Infolayout = QGridLayout(self)
@@ -75,9 +167,7 @@ class MainWindow(QWidget):
         self.Infolayout.addWidget(self.sourceLink, 0, 2, 1, 2)
         self.QGithub.setLayout(self.Infolayout)
 
-
     def Dev(self):
-        
         self.Devlayout = QGridLayout(self)
         self.Devlayout.setAlignment(Qt.AlignTop)
 
@@ -112,11 +202,13 @@ class MainWindow(QWidget):
         self.Tab1input1.setAlignment(QtCore.Qt.AlignCenter)
         self.Tab1input1.setPlaceholderText("NAME 1")
         self.Tab1input1.setFixedHeight(32)
+        self.Tab1input1.editingFinished.connect(self.Tab1input1Fin)
 
         self.Tab1input2 = QLineEdit()
         self.Tab1input2.setAlignment(QtCore.Qt.AlignCenter)
         self.Tab1input2.setPlaceholderText("NAME 2")
         self.Tab1input2.setFixedHeight(32)
+        self.Tab1input2.editingFinished.connect(self.Tab1input2Fin)
 
         self.Tab1analysisButton = QPushButton('Analysis')
         self.Tab1analysisButton.setFixedHeight(32)
@@ -135,6 +227,14 @@ class MainWindow(QWidget):
         # 최종 반영
         self.QTab1.setLayout(self.Tab1layout)
 
+    def Tab1input1Fin(self):
+        self.Tab1input2.setFocus()
+        self.Tab1input2.selectAll()
+
+    def Tab1input2Fin(self):
+        self.Tab1analysisButton.click()
+        self.Tab1input1.setFocus()
+        self.Tab1input1.selectAll()
 
     def Tab1ButtonClick(self):
         self.Tab1name1list = re.compile('[가-힣]+').findall(self.Tab1input1.text())
@@ -157,7 +257,7 @@ class MainWindow(QWidget):
         self.alert = QMessageBox()
         self.alert.setIcon(QMessageBox.Critical)
         self.alert.setWindowTitle('Invalid Input')
-        self.alert.setWindowIcon(QIcon('icons/name.png'))
+        self.alert.setWindowIcon(QIcon('icons/NK.png'))
         self.alert.setText('Invalid Input. Please Retry.\nCondition : KR 2 or 3 Letter')
         self.alert.setStandardButtons(QMessageBox.Retry)
         self.alert.setDefaultButton(QMessageBox.Retry)
@@ -446,6 +546,7 @@ class MainWindow(QWidget):
         self.Tab2input1.setAlignment(QtCore.Qt.AlignCenter)
         self.Tab2input1.setPlaceholderText("NAME 1")
         self.Tab2input1.setFixedHeight(40)
+        self.Tab2input1.editingFinished.connect(self.Tab2input1Fin)
 
         self.Tab2input2 = QListWidget()
         self.Tab2input2.setFixedHeight(128)
@@ -454,7 +555,13 @@ class MainWindow(QWidget):
         self.Tab2analysisButton.setFixedHeight(32)
         self.Tab2analysisButton.clicked.connect(self.Tab2ButtonClick)
 
-        self.Tab2Blank = QLabel('\n')
+        self.Tab2Blank1 = QLabel('\n')
+        self.Tab2table = QTableWidget()
+        self.Tab2Blank2 = QLabel('\n')
+
+        self.Tab2SaveAsCSV = QPushButton('SAVE AS CSV')
+        self.Tab2SaveAsCSV.setFixedHeight(27)
+        self.Tab2SaveAsCSV.clicked.connect(self.Tab2SaveCSV)
 
         self.Tab2Tree = QGridLayout(self)
         self.Tab2Tree.setAlignment(Qt.AlignTop)
@@ -467,10 +574,39 @@ class MainWindow(QWidget):
         self.Tab2layout.addWidget(self.Tab2input1, 1, 0, 1, 2)
         self.Tab2layout.addWidget(self.Tab2input2, 1, 2, 1, 2)
         self.Tab2layout.addWidget(self.Tab2analysisButton, 2, 0, 1, 4)
-        self.Tab2layout.addWidget(self.Tab2Blank, 3, 0, 1, 4)
+        self.Tab2layout.addWidget(self.Tab2Blank1, 3, 0, 1, 4)
+        self.Tab2layout.addWidget(self.Tab2table, 4, 0, 1, 4)
+        self.Tab2layout.addWidget(self.Tab2SaveAsCSV, 5, 0, 1, 4)
 
         # 최종 반영
         self.QTab2.setLayout(self.Tab2layout)
+
+    def Tab2input1Fin(self):
+        self.Tab2AddButton.setFocus()
+
+    def Tab2SaveCSV(self):
+        if (self.Tab2NAME1col == []):
+            self.alert = QMessageBox()
+            self.alert.setIcon(QMessageBox.Critical)
+            self.alert.setWindowTitle('No Data Exists')
+            self.alert.setWindowIcon(QIcon('icons/NK.png'))
+            self.alert.setText('No Data Exists.\nPlease Analysis First.')
+            self.alert.setStandardButtons(QMessageBox.Retry)
+            self.alert.setDefaultButton(QMessageBox.Retry)
+            self.ret = self.alert.exec_()
+            return
+        
+        defaultFileName = self.Tab2NAME1col[0].replace('○','') + ', ' + str(len(self.Tab2NAME2col)) + '.csv'
+        name = QFileDialog.getSaveFileName(self, 'Save file', defaultFileName, "Comma-Separated Values (*.csv)")
+
+        if name == ('', ''):
+            return
+        
+        with open(list(name)[0], mode='w', newline='') as csv_file:
+            csv_writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+
+            for f in range(len(self.Tab2NAME1col)):
+                csv_writer.writerow([self.Tab2NAME1col[f].replace('○',''), self.Tab2NAME2col[f].replace('○',''), self.Tab2RESULTcol[f]])
 
     def Tab2TXTClick(self):
         self.loadTXT = QFileDialog()
@@ -549,12 +685,12 @@ class MainWindow(QWidget):
     
     def Tab2ButtonClick(self):
         self.Tab2input1Text = ''.join(re.compile('[가-힣]+').findall(self.Tab2input1.text()))
-        self.Tab2input2itemsList = self.Tab2input2.findItems("", Qt.MatchContains)
+        self.Tab2input2itemsList = []
         
         if (len(self.Tab2input1Text) == 2 or len(self.Tab2input1Text) == 3):
             if (len(self.Tab2input1.text()) == 2 or len(self.Tab2input1.text()) == 3):
-                if (len(self.Tab2input2itemsList) != 0):
-
+                if (self.Tab2input2.count() != 0):
+                    
                     self.Tab2Analyser(self.Tab2input1Text, self.Tab2input2itemsList)
                     return
 
@@ -562,7 +698,7 @@ class MainWindow(QWidget):
         self.alert = QMessageBox()
         self.alert.setIcon(QMessageBox.Critical)
         self.alert.setWindowTitle('Invalid Input')
-        self.alert.setWindowIcon(QIcon('icons/name.png'))
+        self.alert.setWindowIcon(QIcon('icons/NK.png'))
         self.alert.setText('Invalid Input. Please Retry.\nCondition : KR 2 or 3 Letter')
         self.alert.setStandardButtons(QMessageBox.Retry)
         self.alert.setDefaultButton(QMessageBox.Retry)
@@ -572,12 +708,18 @@ class MainWindow(QWidget):
         self.Tab2NAME1col = []
         self.Tab2NAME2col = []
         self.Tab2RESULTcol = []
-        
+
+        for i in range(self.Tab2input2.count()):
+            Names2.append(self.Tab2input2.item(i))
+
         # 모든 아이템을 가져와 글자로 변환
         for j in range(len(Names2)):
             Names2[j] = Names2[j].text()
 
-        # 2글자 처리
+         # 2글자 처리
+        if (len(Name1) == 2):
+            Name1 = Name1 + '○'
+
         for k in range(len(Names2)):
             if (len(Names2[k]) == 2):
                 Names2[k] = Names2[k] + '○'
@@ -622,8 +764,16 @@ class MainWindow(QWidget):
 
         self.Tab2table = QTableWidget()
         self.Tab2table.setRowCount(len(Names2))
-        print(len(Names2))
         self.Tab2table.setColumnCount(3)
+
+        self.Tab2table.setColumnWidth(0, 145)
+        self.Tab2table.setColumnWidth(1, 145)
+        self.Tab2table.setColumnWidth(2, 145)
+
+        self.header = self.Tab2table.horizontalHeader()       
+        self.header.setSectionResizeMode(0, QHeaderView.Stretch)
+        self.header.setSectionResizeMode(1, QHeaderView.Stretch)
+        self.header.setSectionResizeMode(2, QHeaderView.Stretch)
 
         for q in range(len(Names2)):
             self.Tab2table.setItem(q, 0, QTableWidgetItem(self.Tab2NAME1col[q].replace('○','')))
@@ -637,8 +787,6 @@ class MainWindow(QWidget):
 
 
 
-
-
 if __name__ == '__main__':
     import sys
     app = QApplication(sys.argv)
@@ -649,9 +797,16 @@ if __name__ == '__main__':
 
     window = MainWindow()
 
-    #palatte = window.palette()
-    #palatte.setColor(window.backgroundRole(), Qt.white)
-    #window.setPalette(palatte)
+    # 테마 설정
+    # DarkThemeFile = QFile(path.abspath(path.join(path.dirname(__file__), 'styles/style.qss')))
+    # DarkThemeFile.open(QFile.ReadOnly | QFile.Text)
+    # stream = QTextStream(DarkThemeFile)
+    # app.setStyleSheet(stream.readAll())
+
+    # 윈도우 뒤쪽 색 설정
+    # palatte = window.palette()
+    # palatte.setColor(window.backgroundRole(), Qt.white)
+    # window.setPalette(palatte)
 
     window.show()
     sys.exit(app.exec())
