@@ -29,7 +29,7 @@ class MainWindow(QWidget):
         self.Tab2RESULTcol = []
 
         self.setWindowTitle('Korean Name Compatibility Checker GUI')
-        self.iconfilename = u'./icons/{}'.format('NK.png')
+        self.iconfilename = path.abspath(path.join(path.dirname(__file__), 'icons/NK.png'))
 
         self.setWindowIcon(QIcon(self.iconfilename))
         self.resize(500, 650)
@@ -64,6 +64,7 @@ class MainWindow(QWidget):
         self.Info()
         self.Tab1()
         self.Tab2()
+        self.Tab3()
 
     def ShortCut(self):
         self.SCexit = QShortcut(QKeySequence('Ctrl+W'), self)
@@ -157,7 +158,7 @@ class MainWindow(QWidget):
 
         self.octocat = QLabel(self)
         self.octocat.setScaledContents(True)
-        self.octocat.setPixmap(QPixmap('./icons/github.png'))
+        self.octocat.setPixmap(QPixmap(path.abspath(path.join(path.dirname(__file__), 'icons/github.png'))))
         self.octocat.setFixedSize(64, 64)
 
         self.sourceLink = QLabel('  Source Code : <a href="https://github.com/STR-HK/Knac">Repository Link</a>')
@@ -563,9 +564,6 @@ class MainWindow(QWidget):
         self.Tab2SaveAsCSV.setFixedHeight(27)
         self.Tab2SaveAsCSV.clicked.connect(self.Tab2SaveCSV)
 
-        self.Tab2Tree = QGridLayout(self)
-        self.Tab2Tree.setAlignment(Qt.AlignTop)
-
         self.Tab2layout.addWidget(self.Tab2TXTButton, 0, 0, 1, 1)
         self.Tab2layout.addWidget(self.Tab2CSVButton, 0, 1, 1, 1)
         self.Tab2layout.addWidget(self.Tab2AddButton, 0, 2, 1, 1)
@@ -589,7 +587,7 @@ class MainWindow(QWidget):
             self.alert = QMessageBox()
             self.alert.setIcon(QMessageBox.Critical)
             self.alert.setWindowTitle('No Data Exists')
-            self.alert.setWindowIcon(QIcon('icons/NK.png'))
+            self.alert.setWindowIcon(QIcon(path.abspath(path.join(path.dirname(__file__), 'icons/NK.png'))))
             self.alert.setText('No Data Exists.\nPlease Analysis First.')
             self.alert.setStandardButtons(QMessageBox.Retry)
             self.alert.setDefaultButton(QMessageBox.Retry)
@@ -698,7 +696,7 @@ class MainWindow(QWidget):
         self.alert = QMessageBox()
         self.alert.setIcon(QMessageBox.Critical)
         self.alert.setWindowTitle('Invalid Input')
-        self.alert.setWindowIcon(QIcon('icons/NK.png'))
+        self.alert.setWindowIcon(QIcon(path.abspath(path.join(path.dirname(__file__), 'icons/NK.png'))))
         self.alert.setText('Invalid Input. Please Retry.\nCondition : KR 2 or 3 Letter')
         self.alert.setStandardButtons(QMessageBox.Retry)
         self.alert.setDefaultButton(QMessageBox.Retry)
@@ -785,6 +783,104 @@ class MainWindow(QWidget):
         # 최종 반영
         self.QTab2.setLayout(self.Tab2layout)
 
+    def Tab3(self):
+        self.Tab3layout = QGridLayout(self)
+        self.Tab3layout.setAlignment(Qt.AlignTop)
+
+        self.GroupBox1 = QGroupBox('NAME 1')
+        self.GroupBox2 = QGroupBox('NAME 2')
+        self.Hbox1 = QHBoxLayout()
+        self.Hbox15 = QHBoxLayout()
+        self.Hbox2 = QHBoxLayout()
+        self.Hbox25 = QHBoxLayout()
+
+        self.Vbox1 = QVBoxLayout()
+        self.Vbox2 = QVBoxLayout()
+
+        self.Tab3TXTButton1 = QPushButton()
+        self.Tab3TXTButton1.setText('TXT 1')
+        self.Tab3TXTButton1.setFixedHeight(20)
+        # self.Tab3TXTButton1.clicked.connect(self.Tab2TXTButton1Click)
+        self.Tab3CSVButton1 = QPushButton()
+        self.Tab3CSVButton1.setText('CSV 1')
+        self.Tab3CSVButton1.setFixedHeight(20)
+        # self.Tab3CSVButton1.clicked.connect(self.Tab2CSVButton1Click)
+        self.Tab3AddButton1 = QPushButton()
+        self.Tab3AddButton1.setText('+')
+        self.Tab3AddButton1.setFixedHeight(20)
+        # self.Tab3AddButton1.clicked.connect(self.Tab2AddCButton1lick)
+        self.Tab3RemoveButton1 = QPushButton()
+        self.Tab3RemoveButton1.setText('-')
+        self.Tab3RemoveButton1.setFixedHeight(20)
+        # self.Tab3RemoveButton1.clicked.connect(self.Tab2RemoveButton1Click)
+        self.Hbox1.addWidget(self.Tab3TXTButton1)
+        self.Hbox1.addWidget(self.Tab3CSVButton1)
+        self.Hbox15.addWidget(self.Tab3AddButton1)
+        self.Hbox15.addWidget(self.Tab3RemoveButton1)
+
+        self.Vbox1.addLayout(self.Hbox1)
+        self.Vbox1.addLayout(self.Hbox15)
+
+        self.Tab3TXTButton2 = QPushButton()
+        self.Tab3TXTButton2.setText('TXT 2')
+        self.Tab3TXTButton2.setFixedHeight(20)
+        # self.Tab3TXTButton2.clicked.connect(self.Tab2TXTButton2Click)
+        self.Tab3CSVButton2 = QPushButton()
+        self.Tab3CSVButton2.setText('CSV 2')
+        self.Tab3CSVButton2.setFixedHeight(20)
+        # self.Tab3CSVButton2.clicked.connect(self.Tab2CSVButton2Click)
+        self.Tab3AddButton2 = QPushButton()
+        self.Tab3AddButton2.setText('+')
+        self.Tab3AddButton2.setFixedHeight(20)
+        # self.Tab3AddButton2.clicked.connect(self.Tab2AddButton2Click)
+        self.Tab3RemoveButton2 = QPushButton()
+        self.Tab3RemoveButton2.setText('-')
+        self.Tab3RemoveButton2.setFixedHeight(20)
+        # self.Tab3RemoveButton2.clicked.connect(self.Tab2RemoveButton2Click)
+        self.Hbox2.addWidget(self.Tab3TXTButton2)
+        self.Hbox2.addWidget(self.Tab3CSVButton2)
+        self.Hbox25.addWidget(self.Tab3AddButton2)
+        self.Hbox25.addWidget(self.Tab3RemoveButton2)
+
+        self.Vbox2.addLayout(self.Hbox2)
+        self.Vbox2.addLayout(self.Hbox25)
+
+        self.GroupBox1.setLayout(self.Vbox1)
+        self.GroupBox1.setFixedHeight(220)
+        self.GroupBox1.setAlignment(Qt.AlignCenter)
+        self.GroupBox2.setLayout(self.Vbox2)
+        self.GroupBox2.setFixedHeight(220)
+        self.GroupBox2.setAlignment(Qt.AlignCenter)
+
+        self.Tab3input1 = QListWidget()
+        self.Tab3input1.setFixedHeight(128)
+        self.Tab3input2 = QListWidget()
+        self.Tab3input2.setFixedHeight(128)
+
+        self.Vbox1.addWidget(self.Tab3input1)
+        self.Vbox2.addWidget(self.Tab3input2)
+
+        self.Tab3analysisButton = QPushButton('Analysis (It will take some time)')
+        self.Tab3analysisButton.setFixedHeight(32)
+        # self.Tab3analysisButton.clicked.connect(self.Tab3ButtonClick)
+
+        self.Tab3Blank1 = QLabel('\n')
+        self.Tab3table = QTableWidget()
+        self.Tab3Blank2 = QLabel('\n')
+
+        self.Tab3SaveAsCSV = QPushButton('SAVE AS CSV')
+        self.Tab3SaveAsCSV.setFixedHeight(27)
+        # self.Tab3SaveAsCSV.clicked.connect(self.Tab3SaveCSV)
+
+        self.Tab3layout.addWidget(self.GroupBox1, 0, 0, 1, 2)
+        self.Tab3layout.addWidget(self.GroupBox2, 0, 2, 1, 2)
+        self.Tab3layout.addWidget(self.Tab3analysisButton, 1, 0, 1, 4)
+        self.Tab3layout.addWidget(self.Tab3Blank1, 2, 0, 1, 4)
+        self.Tab3layout.addWidget(self.Tab3table, 3, 0, 1, 4)
+        self.Tab3layout.addWidget(self.Tab3SaveAsCSV, 4, 0, 1, 4)
+
+        # 최종 반영
+        self.QTab3.setLayout(self.Tab3layout)
 
 
 if __name__ == '__main__':
