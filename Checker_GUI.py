@@ -16,6 +16,7 @@ from os import path
 import json
 import re
 import csv
+import time
 
 import Hangul
 
@@ -26,6 +27,13 @@ class MainWindow(QWidget):
         self.Tab2NAME1col = []
         self.Tab2NAME2col = []
         self.Tab2RESULTcol = []
+
+        self.Tab3NAME1col = []
+        self.Tab3NAME2col = []
+        self.Tab3RESULTcol = []
+
+        self.Tab3NAME1Count = 0
+        self.Tab3NAME2Count = 0
 
         self.setWindowTitle('Korean Name Compatibility Checker GUI')
         self.iconfilename = path.abspath(path.join(path.dirname(__file__), 'icons/NK.png'))
@@ -45,13 +53,13 @@ class MainWindow(QWidget):
         self.QTab2 = QWidget()
         self.QTab3 = QWidget()
         self.QGithub = QWidget()
-        self.QDev = QWidget()
+        # self.QDev = QWidget()
 
         self.QTabs.addTab(self.QTab1, "𝟏 by 𝟏")
         self.QTabs.addTab(self.QTab2, "𝟏 by 𝒏")
         self.QTabs.addTab(self.QTab3, "𝒏 by 𝒏")
-        self.QTabs.addTab(self.QGithub, "𝐈𝐧𝐟𝐨")
-        self.QTabs.addTab(self.QDev, "𝕯𝖊𝖛")
+        self.QTabs.addTab(self.QGithub, "𝐈𝐧𝐟𝐨𝐫𝐦𝐚𝐭𝐢𝐨𝐧")
+        # self.QTabs.addTab(self.QDev, "𝕯𝖊𝖛")
         
         self.layout.addWidget(self.QTabs)
         self.setLayout(self.layout)
@@ -98,6 +106,27 @@ class MainWindow(QWidget):
         self.SCN2 = QShortcut(QKeySequence('Ctrl+M'), self)
         self.SCN2.activated.connect(self.Name2)
 
+        self.SCTab3Plus1 = QShortcut(QKeySequence('Ctrl+K'), self)
+        self.SCTab3Plus1.activated.connect(self.Tab3Plus1)
+        self.SCTab3Plus2 = QShortcut(QKeySequence('Ctrl+L'), self)
+        self.SCTab3Plus2.activated.connect(self.Tab3Plus2)
+
+        self.SCTab3TXT1 = QShortcut(QKeySequence('Ctrl+Y'), self)
+        self.SCTab3TXT1.activated.connect(self.Tab3TXT1)
+        self.SCTab3TXT2 = QShortcut(QKeySequence('Ctrl+U'), self)
+        self.SCTab3TXT2.activated.connect(self.Tab3TXT2)
+
+        self.SCTab3CSV1 = QShortcut(QKeySequence('Ctrl+V'), self)
+        self.SCTab3CSV1.activated.connect(self.Tab3CSV1)
+        self.SCTab3CSV2 = QShortcut(QKeySequence('Ctrl+B'), self)
+        self.SCTab3CSV2.activated.connect(self.Tab3CSV2)
+
+        self.SCTab3CSV2 = QShortcut(QKeySequence('Ctrl+D'), self)
+        self.SCTab3CSV2.activated.connect(self.SDuplicate)
+
+    def SDuplicate(self):
+        self.Tab3DuplicateCheckBox.click()
+
     def Name1(self):
         if (self.QTabs.currentIndex() == 0):
             self.Tab1input1.setFocus()
@@ -112,7 +141,7 @@ class MainWindow(QWidget):
         if (self.QTabs.currentIndex() == 1):
             self.Tab2SaveAsCSV.click()
         elif (self.QTabs.currentIndex() == 2):
-            print('탭3s')
+            self.Tab3SaveAsCSV.click()
 
     def analysis(self):
         if (self.QTabs.currentIndex() == 0):
@@ -120,13 +149,26 @@ class MainWindow(QWidget):
         elif (self.QTabs.currentIndex() == 1):
             self.Tab2analysisButton.click()
         elif (self.QTabs.currentIndex() == 2):
-            print('탭3A')
+            self.Tab3analysisButton.click()
     
     def plus(self):
         if (self.QTabs.currentIndex() == 1):
             self.Tab2AddButton.click()
         elif (self.QTabs.currentIndex() == 2):
-            print('탭3P')
+            self.alert = QMessageBox()
+            self.alert.setIcon(QMessageBox.Information)
+            self.alert.setWindowTitle('Not Supported')
+            self.alert.setWindowIcon(QIcon('icons/NK.png'))
+            self.alert.setText('Not Supported Shortkut.\nUse Ctrl+K and Ctrl+L.')
+            self.alert.setStandardButtons(QMessageBox.Retry)
+            self.alert.setDefaultButton(QMessageBox.Retry)
+            self.ret = self.alert.exec_()
+
+    def Tab3Plus1(self):
+        self.Tab3AddButton1.click()
+
+    def Tab3Plus2(self):
+        self.Tab3AddButton2.click()
 
     def gotoTab1(self):
         self.QTabs.setCurrentIndex(0)
@@ -143,13 +185,39 @@ class MainWindow(QWidget):
         if (self.QTabs.currentIndex() == 1):
             self.Tab2TXTButton.click()
         elif (self.QTabs.currentIndex() == 2):
-            print('탭3T')
-    
+            self.alert = QMessageBox()
+            self.alert.setIcon(QMessageBox.Information)
+            self.alert.setWindowTitle('Not Supported')
+            self.alert.setWindowIcon(QIcon('icons/NK.png'))
+            self.alert.setText('Not Supported Shortkut.\nUse Ctrl+Y and Ctrl+U.')
+            self.alert.setStandardButtons(QMessageBox.Retry)
+            self.alert.setDefaultButton(QMessageBox.Retry)
+            self.ret = self.alert.exec_()
+
+    def Tab3TXT1(self):
+        self.Tab3TXTButton1.click()
+
+    def Tab3TXT2(self):
+        self.Tab3TXTButton2.click()
+
     def CSV(self):
         if (self.QTabs.currentIndex() == 1):
             self.Tab2CSVButton.click()
         elif (self.QTabs.currentIndex() == 2):
-            print('탭3C')
+            self.alert = QMessageBox()
+            self.alert.setIcon(QMessageBox.Information)
+            self.alert.setWindowTitle('Not Supported')
+            self.alert.setWindowIcon(QIcon('icons/NK.png'))
+            self.alert.setText('Not Supported Shortkut.\nUse Ctrl+V and Ctrl+B.')
+            self.alert.setStandardButtons(QMessageBox.Retry)
+            self.alert.setDefaultButton(QMessageBox.Retry)
+            self.ret = self.alert.exec_()
+
+    def Tab3CSV1(self):
+        self.Tab3CSVButton1.click()
+
+    def Tab3CSV2(self):
+        self.Tab3CSVButton2.click()
 
     def Info(self):
         self.Infolayout = QGridLayout(self)
@@ -164,8 +232,19 @@ class MainWindow(QWidget):
         self.sourceLink = QLabel('Source Code : <a href="https://github.com/STR-HK/Knac">Repository Link</a>')
         self.sourceLink.setOpenExternalLinks(True)
 
-        self.Infolayout.addWidget(self.octocat, 0, 1, 1, 1)
-        self.Infolayout.addWidget(self.sourceLink, 0, 2, 1, 2)
+        self.font = QLabel(self)
+        self.font.setScaledContents(True)
+        self.font.setPixmap(QPixmap(path.abspath(path.join(path.dirname(__file__), 'icons/font.png'))))
+        self.font.setFixedSize(64, 64)
+
+        self.fontsourceLink = QLabel('NanumSquareOTF ac Bold : <a href="https://hangeul.naver.com/font">Site Link</a>')
+        self.fontsourceLink.setOpenExternalLinks(True)
+
+        self.Infolayout.addWidget(self.font, 0, 1, 1, 1)
+        self.Infolayout.addWidget(self.fontsourceLink, 0, 2, 1, 2)
+        self.Infolayout.addWidget(self.octocat, 1, 1, 1, 1)
+        self.Infolayout.addWidget(self.sourceLink, 1, 2, 1, 2)
+        
         self.QGithub.setLayout(self.Infolayout)
 
     def Dev(self):
@@ -814,7 +893,7 @@ class MainWindow(QWidget):
         for q in range(len(Names2)):
             self.Tab2table.setItem(q, 0, QTableWidgetItem(self.Tab2NAME1col[q].replace('○','')))
             self.Tab2table.setItem(q, 1, QTableWidgetItem(self.Tab2NAME2col[q].replace('○','')))
-            self.Tab2table.setItem(q, 2, QTableWidgetItem(self.Tab2RESULTcol[q].replace('○','')))
+            self.Tab2table.setItem(q, 2, QTableWidgetItem(self.Tab2RESULTcol[q]))
 
         self.Tab2layout.addWidget(self.Tab2table, 4, 0, 1, 4)
 
@@ -898,6 +977,11 @@ class MainWindow(QWidget):
         self.Vbox1.addWidget(self.Tab3input1)
         self.Vbox2.addWidget(self.Tab3input2)
 
+        self.Tab3DuplicateCheckBox = QPushButton('Duplicate\nL to R')
+        self.Tab3DuplicateCheckBox.setStyleSheet('font-size: 11px')
+        self.Tab3DuplicateCheckBox.setFixedHeight(32)
+        self.Tab3DuplicateCheckBox.clicked.connect(self.Duplicate)
+
         self.Tab3analysisButton = QPushButton('Analysis (It will take some time)')
         self.Tab3analysisButton.setFixedHeight(32)
         self.Tab3analysisButton.clicked.connect(self.Tab3ButtonClick)
@@ -908,17 +992,53 @@ class MainWindow(QWidget):
 
         self.Tab3SaveAsCSV = QPushButton('SAVE AS CSV')
         self.Tab3SaveAsCSV.setFixedHeight(27)
-        # self.Tab3SaveAsCSV.clicked.connect(self.Tab3SaveCSV)
+        self.Tab3SaveAsCSV.clicked.connect(self.Tab3SaveCSV)
 
         self.Tab3layout.addWidget(self.GroupBox1, 0, 0, 1, 2)
         self.Tab3layout.addWidget(self.GroupBox2, 0, 2, 1, 2)
-        self.Tab3layout.addWidget(self.Tab3analysisButton, 1, 0, 1, 4)
+        self.Tab3layout.addWidget(self.Tab3DuplicateCheckBox, 1, 3, 1, 1)
+        self.Tab3layout.addWidget(self.Tab3analysisButton, 1, 0, 1, 3)
         self.Tab3layout.addWidget(self.Tab3Blank1, 2, 0, 1, 4)
         self.Tab3layout.addWidget(self.Tab3table, 3, 0, 1, 4)
         self.Tab3layout.addWidget(self.Tab3SaveAsCSV, 4, 0, 1, 4)
 
         # 최종 반영
         self.QTab3.setLayout(self.Tab3layout)
+
+    def Tab3SaveCSV(self):
+        if (self.Tab3NAME1col == [] or self.Tab3NAME2col == []):
+            self.alert = QMessageBox()
+            self.alert.setIcon(QMessageBox.Critical)
+            self.alert.setWindowTitle('No Data Exists')
+            self.alert.setWindowIcon(QIcon(path.abspath(path.join(path.dirname(__file__), 'icons/NK.png'))))
+            self.alert.setText('No Data Exists.\nPlease Analysis First.')
+            self.alert.setStandardButtons(QMessageBox.Retry)
+            self.alert.setDefaultButton(QMessageBox.Retry)
+            self.ret = self.alert.exec_()
+            return
+        
+        defaultFileName = self.Tab3NAME1col[0].replace('○','') + ' +' + str(self.Tab3NAME1Count - 1) + ', ' + self.Tab3NAME1col[0].replace('○','') + ' +' + str(self.Tab3NAME2Count - 1) + '.csv'
+        name = QFileDialog.getSaveFileName(self, 'Save file', defaultFileName, "Comma-Separated Values (*.csv)")
+
+        if name == ('', ''):
+            return
+        
+        with open(list(name)[0], mode='w', newline='') as csv_file:
+            csv_writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+
+            for h in range(self.Tab3NAME1Count * self.Tab3NAME2Count):
+                csv_writer.writerow([self.Tab3NAME1col[h].replace('○',''), self.Tab3NAME2col[h].replace('○',''), self.Tab3RESULTcol[h]])
+
+            # for f in range(len(self.Tab2NAME1col)):
+            #     csv_writer.writerow([self.Tab2NAME1col[f].replace('○',''), self.Tab2NAME2col[f].replace('○',''), self.Tab2RESULTcol[f]])
+
+    def Duplicate(self):
+        self.Tab3input2.clear()
+        for i in range(self.Tab3input1.count()):
+            self.Tab3AddItem = QListWidgetItem(self.Tab3input1.item(i))
+            self.Tab3AddItem.setTextAlignment(Qt.AlignCenter)
+            self.Tab3AddItem.setSizeHint(QSize(0, 25))
+            self.Tab3input2.addItem(self.Tab3AddItem)
 
     def Tab3TXTButton1Click(self):
         self.loadTXT = QFileDialog()
@@ -1082,84 +1202,88 @@ class MainWindow(QWidget):
         self.ret = self.alert.exec_()
 
     def Tab3Analyser(self, Names1, Names2):
-        self.Tab3NAME1col = []
-        self.Tab3NAME2col = []
-        self.Tab3RESULT = []
-
-        for i in range(self.Tab2input2.count()):
-            Names2.append(self.Tab2input2.item(i))
+        for f in range(self.Tab3input1.count()):
+            Names1.append(self.Tab3input1.item(f))
+        for g in range(self.Tab3input2.count()):
+            Names2.append(self.Tab3input2.item(g))
 
         # 모든 아이템을 가져와 글자로 변환
-        for j in range(len(Names2)):
-            Names2[j] = Names2[j].text()
+        for j in range(len(Names1)):
+            Names1[j] = Names1[j].text()
+        for k in range(len(Names2)):
+            Names2[k] = Names2[k].text()
 
          # 2글자 처리
-        if (len(Name1) == 2):
-            Name1 = Name1 + '○'
+        for l in range(len(Names1)):
+            if (len(Names1[l]) == 2):
+                Names1[l] = Names1[l] + '○'
+        for m in range(len(Names2)):
+            if (len(Names2[m]) == 2):
+                Names2[m] = Names2[m] + '○'
 
-        for k in range(len(Names2)):
-            if (len(Names2[k]) == 2):
-                Names2[k] = Names2[k] + '○'
+        self.Tab3NAME1Count = len(Names1)
+        self.Tab3NAME2Count = len(Names2)
 
-        for l in range(len(Names2)):
-            self.Name1toList = []
-            self.Name2toList = []
+        for o in range(len(Names1)):
+            for p in range(len(Names2)):
 
-            for a in range(3):
-                self.Name1toList.append(Name1[a])
-                self.Name1toList[a] = Hangul.gyeopjamo(Hangul.jamo(self.Name1toList[a]))
-                self.Name1toList[a] = Hangul.convertonumber(''.join(self.Name1toList[a]))
-            for b in range(3):
-                self.Name2toList.append(Names2[l][b])
-                self.Name2toList[b] = Hangul.gyeopjamo(Hangul.jamo(self.Name2toList[b]))
-                self.Name2toList[b] = Hangul.convertonumber(''.join(self.Name2toList[b]))
+                self.Name1toList = []
+                self.Name2toList = []
 
-            self.Name1and2 = []
-            for w in range(3):
-                self.Name1and2.append(self.Name1toList[w])
-                self.Name1and2.append(self.Name2toList[w])
+                for a in range(3):
+                    self.Name1toList.append(Names1[o][a])
+                    self.Name1toList[a] = Hangul.gyeopjamo(Hangul.jamo(self.Name1toList[a]))
+                    self.Name1toList[a] = Hangul.convertonumber(''.join(self.Name1toList[a]))
+                for b in range(3):
+                    self.Name2toList.append(Names2[p][b])
+                    self.Name2toList[b] = Hangul.gyeopjamo(Hangul.jamo(self.Name2toList[b]))
+                    self.Name2toList[b] = Hangul.convertonumber(''.join(self.Name2toList[b]))
+                
+                self.Name1and2 = []
+                for w in range(3):
+                    self.Name1and2.append(self.Name1toList[w])
+                    self.Name1and2.append(self.Name2toList[w])
 
-            self.Name3List = []
-            for x in range(5):
-                self.Name3List.append(int(str((self.Name1and2[x] + self.Name1and2[x+1]))[-1]))
+                self.Name3List = []
+                for x in range(5):
+                    self.Name3List.append(int(str((self.Name1and2[x] + self.Name1and2[x+1]))[-1]))
 
-            self.Name4List = []
-            for u in range(4):
-                self.Name4List.append(int(str((self.Name3List[u] + self.Name3List[u+1]))[-1]))
+                self.Name4List = []
+                for u in range(4):
+                    self.Name4List.append(int(str((self.Name3List[u] + self.Name3List[u+1]))[-1]))
 
-            self.Name5List = []
-            for v in range(3):
-                self.Name5List.append(int(str((self.Name4List[v] + self.Name4List[v+1]))[-1]))
+                self.Name5List = []
+                for v in range(3):
+                    self.Name5List.append(int(str((self.Name4List[v] + self.Name4List[v+1]))[-1]))
 
-            self.Name6List = []
-            for k in range(2):
-                self.Name6List.append(int(str((self.Name5List[k] + self.Name5List[k+1]))[-1]))
+                self.Name6List = []
+                for k in range(2):
+                    self.Name6List.append(int(str((self.Name5List[k] + self.Name5List[k+1]))[-1]))
 
-            self.Tab2NAME1col.append(Name1)
-            self.Tab2NAME2col.append(Names2[l])
-            self.Tab2RESULTcol.append(str(self.Name6List[0]) + str(self.Name6List[1]) + '%')
+                self.Tab3NAME1col.append(Names1[o].replace('○',''))
+                self.Tab3NAME2col.append(Names2[p].replace('○',''))
+                self.Tab3RESULTcol.append(str(self.Name6List[0]) + str(self.Name6List[1]) + '%')
 
-        self.Tab2table = QTableWidget()
-        self.Tab2table.setRowCount(len(Names2))
-        self.Tab2table.setColumnCount(3)
+        self.Tab3table = QTableWidget()
+        self.Tab3table.setRowCount(len(Names1) * len(Names2))
+        self.Tab3table.setColumnCount(3)
 
-        self.Tab2table.setColumnWidth(0, 145)
-        self.Tab2table.setColumnWidth(1, 145)
-        self.Tab2table.setColumnWidth(2, 145)
+        self.Tab3table.setColumnWidth(0, 145)
+        self.Tab3table.setColumnWidth(1, 145)
+        self.Tab3table.setColumnWidth(2, 145)
 
-        self.header = self.Tab2table.horizontalHeader()       
+        self.header = self.Tab3table.horizontalHeader()       
         self.header.setSectionResizeMode(0, QHeaderView.Stretch)
         self.header.setSectionResizeMode(1, QHeaderView.Stretch)
         self.header.setSectionResizeMode(2, QHeaderView.Stretch)
 
-        for q in range(len(Names2)):
-            self.Tab2table.setItem(q, 0, QTableWidgetItem(self.Tab2NAME1col[q].replace('○','')))
-            self.Tab2table.setItem(q, 1, QTableWidgetItem(self.Tab2NAME2col[q].replace('○','')))
-            self.Tab2table.setItem(q, 2, QTableWidgetItem(self.Tab2RESULTcol[q].replace('○','')))
+        for q in range(len(Names1) * len(Names2)):
+            self.Tab3table.setItem(q, 0, QTableWidgetItem(self.Tab3NAME1col[q].replace('○','')))
+            self.Tab3table.setItem(q, 1, QTableWidgetItem(self.Tab3NAME2col[q].replace('○','')))
+            self.Tab3table.setItem(q, 2, QTableWidgetItem(self.Tab3RESULTcol[q]))
 
-        self.Tab2layout.addWidget(self.Tab2table, 4, 0, 1, 4)
+        self.Tab3layout.addWidget(self.Tab3table, 3, 0, 1, 4)
 
-        # 최종 반영
 
 
 if __name__ == '__main__':
@@ -1167,15 +1291,18 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
 
     fontDB = QFontDatabase()
-    fontDB.addApplicationFont(path.abspath(path.join(path.dirname(__file__), 'fonts/SDGothicNeoM.ttf')))
-    app.setFont(QFont('AppleSDGothicNeoM00', 11))
+    # fontDB.addApplicationFont(path.abspath(path.join(path.dirname(__file__), 'fonts/SDGothicNeoM.ttf')))
+    # app.setFont(QFont('AppleSDGothicNeoM00', 11))
+
+    fontDB.addApplicationFont(path.abspath(path.join(path.dirname(__file__), 'fonts/NanumSquareOTF_acB.otf')))
+    app.setFont(QFont('NanumSquareOTF_ac Bold', 11))
 
     window = MainWindow()
 
     # 테마 설정
-    # DarkThemeFile = QFile(path.abspath(path.join(path.dirname(__file__), 'styles/style.qss')))
-    # DarkThemeFile.open(QFile.ReadOnly | QFile.Text)
-    # stream = QTextStream(DarkThemeFile)
+    # StyleFile = QFile(path.abspath(path.join(path.dirname(__file__), 'styles/MyStyle.css')))
+    # StyleFile.open(QFile.ReadOnly | QFile.Text)
+    # stream = QTextStream(StyleFile)
     # app.setStyleSheet(stream.readAll())
 
     # 윈도우 뒤쪽 색 설정

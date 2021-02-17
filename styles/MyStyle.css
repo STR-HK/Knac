@@ -1,0 +1,13 @@
+QWidget{
+    background-color: #000000;
+}
+
+QTabWidget{
+    border-color: #1F2023;
+}
+
+QPushButton{
+    background-color: #27292D;
+    border-color: #36393E;
+    color: #FBA420;
+}
