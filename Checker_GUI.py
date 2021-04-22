@@ -1,18 +1,22 @@
-from PyQt5.QtCore import QDateTime, Qt, QTimer, QSize, QTextStream, QFile
+from PyQt5.QtCore import QDateTime, Qt, QTimer, QSize, QTextStream, QFile, reset
 from PyQt5.QtWidgets import (QApplication, QCheckBox, QComboBox, QDateTimeEdit,
         QDial, QDialog, QGridLayout, QGroupBox, QHBoxLayout, QLabel, QLineEdit,
         QProgressBar, QPushButton, QRadioButton, QScrollBar, QSizePolicy,
         QSlider, QSpinBox, QStyleFactory, QTableWidget, QTabWidget, QTextEdit,
         QVBoxLayout, QWidget, QMessageBox, QStackedWidget, QStatusBar, QDesktopWidget,
-        QMainWindow, QMenuBar, QAction, QMenu, QListWidget, QListWidgetItem, QInputDialog,
+        QMainWindow, QMenuBar, QAction, QMenu, QListWidget, QListWidgetItem, QInputDialog, QToolBar, 
         QFileDialog, QTableWidgetItem, QHeaderView, QShortcut)
 
 from PyQt5.QtGui import (QIcon, QColor, QPainter, QFontDatabase, QFont,
         QPixmap, QCursor, QKeySequence)
 
+from qtwidgets import AnimatedToggle, toggle
+from qtwidgets import Toggle
+
 from PyQt5 import QtCore
 
 from os import path
+import os
 import json
 import re
 import csv
@@ -23,6 +27,11 @@ import Hangul
 class MainWindow(QWidget):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
+
+        if (os.path.exists('mod.txt') == True):
+            self.strokeOrder = True
+        else:
+            self.strokeOrder = False
         # 다른곳에서 사용하는 변수 및 리스트 선언
         self.Tab2NAME1col = []
         self.Tab2NAME2col = []
@@ -58,13 +67,14 @@ class MainWindow(QWidget):
         self.QTabs.addTab(self.QTab1, "𝟏 by 𝟏")
         self.QTabs.addTab(self.QTab2, "𝟏 by 𝒏")
         self.QTabs.addTab(self.QTab3, "𝒏 by 𝒏")
-        self.QTabs.addTab(self.QGithub, "𝐈𝐧𝐟𝐨𝐫𝐦𝐚𝐭𝐢𝐨𝐧")
+        self.QTabs.addTab(self.QGithub, "𝐄𝐭𝐜")
         # self.QTabs.addTab(self.QDev, "𝕯𝖊𝖛")
         
         self.layout.addWidget(self.QTabs)
         self.setLayout(self.layout)
 
         self.ShortCut()
+
 
         # 일단 사용하지 않음
         # self.Dev()
@@ -240,12 +250,39 @@ class MainWindow(QWidget):
         self.fontsourceLink = QLabel('NanumSquareOTF ac Bold : <a href="https://hangeul.naver.com/font">Site Link</a>')
         self.fontsourceLink.setOpenExternalLinks(True)
 
-        self.Infolayout.addWidget(self.font, 0, 1, 1, 1)
-        self.Infolayout.addWidget(self.fontsourceLink, 0, 2, 1, 2)
-        self.Infolayout.addWidget(self.octocat, 1, 1, 1, 1)
-        self.Infolayout.addWidget(self.sourceLink, 1, 2, 1, 2)
+        groupbox = QGroupBox('Calculate Way Settings')
+        rbtn1 = QRadioButton('By Line Number', self)
+        rbtn2 = QRadioButton('By Stroke Order', self)
+        if self.strokeOrder == False:
+            rbtn1.setChecked(True)
+        elif self.strokeOrder == True:
+            rbtn2.setChecked(True)
+        rbtn1.clicked.connect(self.ChangeMod)
+        rbtn2.clicked.connect(self.ChangeMod)
+        
+        vbox = QVBoxLayout()
+        vbox.addWidget(rbtn1)
+        vbox.addWidget(rbtn2)
+        groupbox.setLayout(vbox)
+
+        self.Infolayout.addWidget(groupbox, 0, 1, 1, 3)
+        self.Infolayout.addWidget(self.font, 1, 1, 1, 1)
+        self.Infolayout.addWidget(self.fontsourceLink, 1, 2, 1, 2)
+        self.Infolayout.addWidget(self.octocat, 2, 1, 1, 1)
+        self.Infolayout.addWidget(self.sourceLink, 2, 2, 1, 2)
+        
         
         self.QGithub.setLayout(self.Infolayout)
+
+    def ChangeMod(self):
+        if self.strokeOrder == False:
+            f = open('mod.txt','w')
+            f.write('This File is Setting File of KNAC DON\'T Remove.')
+            f.close()
+            self.strokeOrder = True
+        else:
+            os.remove('mod.txt')
+            self.strokeOrder = False
 
     def Dev(self):
         self.Devlayout = QGridLayout(self)
@@ -560,11 +597,11 @@ class MainWindow(QWidget):
         for a in range(3):
             self.Name1toList.append(Name1[a])
             self.Name1toList[a] = Hangul.gyeopjamo(Hangul.jamo(self.Name1toList[a]))
-            self.Name1toList[a] = Hangul.convertonumber(''.join(self.Name1toList[a]))
+            self.Name1toList[a] = Hangul.convertonumber(''.join(self.Name1toList[a]), self.strokeOrder)
         for b in range(3):
             self.Name2toList.append(Name2[b])
             self.Name2toList[b] = Hangul.gyeopjamo(Hangul.jamo(self.Name2toList[b]))
-            self.Name2toList[b] = Hangul.convertonumber(''.join(self.Name2toList[b]))
+            self.Name2toList[b] = Hangul.convertonumber(''.join(self.Name2toList[b]), self.strokeOrder)
 
         # 두번째 줄 코드
         self.Tab1TreeLayer2Text1.setText(str(self.Name1toList[0]))
@@ -846,11 +883,11 @@ class MainWindow(QWidget):
             for a in range(3):
                 self.Name1toList.append(Name1[a])
                 self.Name1toList[a] = Hangul.gyeopjamo(Hangul.jamo(self.Name1toList[a]))
-                self.Name1toList[a] = Hangul.convertonumber(''.join(self.Name1toList[a]))
+                self.Name1toList[a] = Hangul.convertonumber(''.join(self.Name1toList[a]), self.strokeOrder)
             for b in range(3):
                 self.Name2toList.append(Names2[l][b])
                 self.Name2toList[b] = Hangul.gyeopjamo(Hangul.jamo(self.Name2toList[b]))
-                self.Name2toList[b] = Hangul.convertonumber(''.join(self.Name2toList[b]))
+                self.Name2toList[b] = Hangul.convertonumber(''.join(self.Name2toList[b]), self.strokeOrder)
 
             self.Name1and2 = []
             for w in range(3):
@@ -1202,6 +1239,10 @@ class MainWindow(QWidget):
         self.ret = self.alert.exec_()
 
     def Tab3Analyser(self, Names1, Names2):
+        self.Tab3NAME1col = []
+        self.Tab3NAME2col = []
+        self.Tab3RESULTcol = []
+
         for f in range(self.Tab3input1.count()):
             Names1.append(self.Tab3input1.item(f))
         for g in range(self.Tab3input2.count()):
@@ -1233,11 +1274,11 @@ class MainWindow(QWidget):
                 for a in range(3):
                     self.Name1toList.append(Names1[o][a])
                     self.Name1toList[a] = Hangul.gyeopjamo(Hangul.jamo(self.Name1toList[a]))
-                    self.Name1toList[a] = Hangul.convertonumber(''.join(self.Name1toList[a]))
+                    self.Name1toList[a] = Hangul.convertonumber(''.join(self.Name1toList[a]), self.strokeOrder)
                 for b in range(3):
                     self.Name2toList.append(Names2[p][b])
                     self.Name2toList[b] = Hangul.gyeopjamo(Hangul.jamo(self.Name2toList[b]))
-                    self.Name2toList[b] = Hangul.convertonumber(''.join(self.Name2toList[b]))
+                    self.Name2toList[b] = Hangul.convertonumber(''.join(self.Name2toList[b]), self.strokeOrder)
                 
                 self.Name1and2 = []
                 for w in range(3):
