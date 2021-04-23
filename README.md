@@ -27,7 +27,7 @@
 
 - Add to Name 1 List : `Ctrl + K`
 - Add to Name 2 List : `Ctrl + L`
-- Load TXT File Name 1 : `Ctrl + Y'
+- Load TXT File Name 1 : `Ctrl + Y`
 - Load TXT File Name 2 : `Ctrl + U`
 - Load CSV File Name 1 : `Ctrl + F`
 - Load CSV File Name 2 : `Ctrl + G`
