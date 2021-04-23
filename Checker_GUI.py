@@ -10,9 +10,6 @@ from PyQt5.QtWidgets import (QApplication, QCheckBox, QComboBox, QDateTimeEdit,
 from PyQt5.QtGui import (QIcon, QColor, QPainter, QFontDatabase, QFont,
         QPixmap, QCursor, QKeySequence)
 
-from qtwidgets import AnimatedToggle, toggle
-from qtwidgets import Toggle
-
 from PyQt5 import QtCore
 
 from os import path
