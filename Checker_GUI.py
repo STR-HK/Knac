@@ -12,7 +12,10 @@ from PyQt5.QtGui import (QIcon, QColor, QPainter, QFontDatabase, QFont,
 
 from PyQt5 import QtCore
 
-from os import path
+import traceback
+import datetime
+
+from os import error, path
 import os
 import json
 import re
@@ -20,6 +23,24 @@ import csv
 import time
 
 import Hangul
+
+def WriteHandledError():
+    filenamae = '[Checker] Error_{}.log'.format(str(datetime.datetime.now()).replace(' ','_').replace(':','-'))
+    errormsg = str(traceback.format_exc())
+
+    f = open(filenamae, 'w')
+    f.write(errormsg)
+    f.close()
+
+    alert = QMessageBox()
+    alert.setIcon(QMessageBox.Critical)
+    alert.setWindowTitle('Error Occurred')
+    alert.setWindowIcon(QIcon('icons/NK.png'))
+    alert.setText('Error is logged in\n{}'.format(filenamae))
+    alert.setDetailedText(errormsg)
+    alert.setStandardButtons(QMessageBox.Ok)
+    alert.setDefaultButton(QMessageBox.Ok)
+    ret = alert.exec_()
 
 class MainWindow(QWidget):
     def __init__(self, parent=None):
@@ -118,9 +139,9 @@ class MainWindow(QWidget):
         self.SCTab3Plus2 = QShortcut(QKeySequence('Ctrl+L'), self)
         self.SCTab3Plus2.activated.connect(self.Tab3Plus2)
 
-        self.SCTab3TXT1 = QShortcut(QKeySequence('Ctrl+Y'), self)
+        self.SCTab3TXT1 = QShortcut(QKeySequence('Ctrl+F'), self)
         self.SCTab3TXT1.activated.connect(self.Tab3TXT1)
-        self.SCTab3TXT2 = QShortcut(QKeySequence('Ctrl+U'), self)
+        self.SCTab3TXT2 = QShortcut(QKeySequence('Ctrl+G'), self)
         self.SCTab3TXT2.activated.connect(self.Tab3TXT2)
 
         self.SCTab3CSV1 = QShortcut(QKeySequence('Ctrl+V'), self)
@@ -157,25 +178,30 @@ class MainWindow(QWidget):
             self.Tab2analysisButton.click()
         elif (self.QTabs.currentIndex() == 2):
             self.Tab3analysisButton.click()
+
+    def notSupportedError(self, Shortcut1, Shortcut2):
+        self.alert = QMessageBox()
+        self.alert.setIcon(QMessageBox.Information)
+        self.alert.setWindowTitle('Not Supported')
+        self.alert.setWindowIcon(QIcon('icons/NK.png'))
+        self.alert.setText('Not Supported Shortcut in this Tab.\nUse {} and {} to Add Name to Each Box.'.format(Shortcut1, Shortcut2))
+        self.alert.setStandardButtons(QMessageBox.Retry)
+        self.alert.setDefaultButton(QMessageBox.Retry)
+        self.ret = self.alert.exec_()
     
     def plus(self):
         if (self.QTabs.currentIndex() == 1):
             self.Tab2AddButton.click()
         elif (self.QTabs.currentIndex() == 2):
-            self.alert = QMessageBox()
-            self.alert.setIcon(QMessageBox.Information)
-            self.alert.setWindowTitle('Not Supported')
-            self.alert.setWindowIcon(QIcon('icons/NK.png'))
-            self.alert.setText('Not Supported Shortkut.\nUse Ctrl+K and Ctrl+L.')
-            self.alert.setStandardButtons(QMessageBox.Retry)
-            self.alert.setDefaultButton(QMessageBox.Retry)
-            self.ret = self.alert.exec_()
+            self.notSupportedError('Ctrl+K','Ctrl+L')
 
     def Tab3Plus1(self):
-        self.Tab3AddButton1.click()
+        if (self.QTabs.currentIndex() == 2):
+            self.Tab3AddButton1.click()
 
     def Tab3Plus2(self):
-        self.Tab3AddButton2.click()
+        if (self.QTabs.currentIndex() == 2):
+            self.Tab3AddButton2.click()
 
     def gotoTab1(self):
         self.QTabs.setCurrentIndex(0)
@@ -192,39 +218,29 @@ class MainWindow(QWidget):
         if (self.QTabs.currentIndex() == 1):
             self.Tab2TXTButton.click()
         elif (self.QTabs.currentIndex() == 2):
-            self.alert = QMessageBox()
-            self.alert.setIcon(QMessageBox.Information)
-            self.alert.setWindowTitle('Not Supported')
-            self.alert.setWindowIcon(QIcon('icons/NK.png'))
-            self.alert.setText('Not Supported Shortkut.\nUse Ctrl+Y and Ctrl+U.')
-            self.alert.setStandardButtons(QMessageBox.Retry)
-            self.alert.setDefaultButton(QMessageBox.Retry)
-            self.ret = self.alert.exec_()
+            self.notSupportedError('Ctrl+Y','Ctrl+U')
 
     def Tab3TXT1(self):
-        self.Tab3TXTButton1.click()
+        if (self.QTabs.currentIndex() == 2):
+            self.Tab3TXTButton1.click()
 
     def Tab3TXT2(self):
-        self.Tab3TXTButton2.click()
+        if (self.QTabs.currentIndex() == 2):
+            self.Tab3TXTButton2.click()
 
     def CSV(self):
         if (self.QTabs.currentIndex() == 1):
             self.Tab2CSVButton.click()
         elif (self.QTabs.currentIndex() == 2):
-            self.alert = QMessageBox()
-            self.alert.setIcon(QMessageBox.Information)
-            self.alert.setWindowTitle('Not Supported')
-            self.alert.setWindowIcon(QIcon('icons/NK.png'))
-            self.alert.setText('Not Supported Shortkut.\nUse Ctrl+V and Ctrl+B.')
-            self.alert.setStandardButtons(QMessageBox.Retry)
-            self.alert.setDefaultButton(QMessageBox.Retry)
-            self.ret = self.alert.exec_()
+            self.notSupportedError('Ctrl+F','Ctrl+G')
 
     def Tab3CSV1(self):
-        self.Tab3CSVButton1.click()
+        if (self.QTabs.currentIndex() == 2):
+            self.Tab3CSVButton1.click()
 
     def Tab3CSV2(self):
-        self.Tab3CSVButton2.click()
+        if (self.QTabs.currentIndex() == 2):
+            self.Tab3CSVButton2.click()
 
     def Info(self):
         self.Infolayout = QGridLayout(self)
@@ -762,29 +778,33 @@ class MainWindow(QWidget):
                 csv_writer.writerow([self.Tab2NAME1col[f].replace('○',''), self.Tab2NAME2col[f].replace('○',''), self.Tab2RESULTcol[f]])
 
     def Tab2TXTClick(self):
-        self.loadTXT = QFileDialog()
-        self.loadTXT.setFileMode(QFileDialog.AnyFile)
-        self.loadTXTfilename = self.loadTXT.getOpenFileName(
-            caption='Open TXT file', filter="Text files (*.txt)")
+        try:
+            self.loadTXT = QFileDialog()
+            self.loadTXT.setFileMode(QFileDialog.AnyFile)
+            self.loadTXTfilename = self.loadTXT.getOpenFileName(
+                caption='Open TXT file', filter="Text files (*.txt)")
 
-        if self.loadTXTfilename:
-            if self.loadTXTfilename[0] == '':
-                return
+            if self.loadTXTfilename:
+                if self.loadTXTfilename[0] == '':
+                    return
             
-            f = open(self.loadTXTfilename[0], 'r',  encoding='utf-8')
-            self.loadTXTList = f.read().split('\n')
+                f = open(self.loadTXTfilename[0], 'r',  encoding='utf-8')
+                self.loadTXTList = f.read().split('\n')
 
-            for x in range(len(self.loadTXTList)):
-                self.loadTXTtoClear = ''.join(re.compile('[가-힣]+').findall(self.loadTXTList[x]))
-                if (len(self.loadTXTList[x]) == 2 or len(self.loadTXTList[x]) == 3):
-                    if (len(self.loadTXTtoClear) == 2 or len(self.loadTXTtoClear) == 3):
-                        self.Tab2AddItem = QListWidgetItem(self.loadTXTtoClear)
-                        self.Tab2AddItem.setTextAlignment(Qt.AlignCenter)
-                        self.Tab2AddItem.setSizeHint(QSize(0, 25))
-                        self.Tab2input2.addItem(self.Tab2AddItem)
+                for x in range(len(self.loadTXTList)):
+                    self.loadTXTtoClear = ''.join(re.compile('[가-힣]+').findall(self.loadTXTList[x]))
+                    if (len(self.loadTXTList[x]) == 2 or len(self.loadTXTList[x]) == 3):
+                        if (len(self.loadTXTtoClear) == 2 or len(self.loadTXTtoClear) == 3):
+                            self.Tab2AddItem = QListWidgetItem(self.loadTXTtoClear)
+                            self.Tab2AddItem.setTextAlignment(Qt.AlignCenter)
+                            self.Tab2AddItem.setSizeHint(QSize(0, 25))
+                            self.Tab2input2.addItem(self.Tab2AddItem)
 
             # self.Tab2layout.addWidget(self.Tab2input2, 1, 2, 1, 2)
             # self.QTab2.setLayout(self.Tab2layout)
+        except:
+            WriteHandledError()
+        
 
 
     def Tab2CSVClick(self):
@@ -1072,28 +1092,32 @@ class MainWindow(QWidget):
             self.Tab3input2.addItem(self.Tab3AddItem)
 
     def Tab3TXTButton1Click(self):
-        self.loadTXT = QFileDialog()
-        self.loadTXT.setFileMode(QFileDialog.AnyFile)
-        self.loadTXTfilename = self.loadTXT.getOpenFileName(
-            caption='Open TXT file', filter="Text files (*.txt)")
+        try:
+            self.loadTXT = QFileDialog()
+            self.loadTXT.setFileMode(QFileDialog.AnyFile)
+            self.loadTXTfilename = self.loadTXT.getOpenFileName(
+                caption='Open TXT file', filter="Text files (*.txt)")
 
-        if self.loadTXTfilename:
-            if self.loadTXTfilename[0] == '':
-                return
+            if self.loadTXTfilename:
+                if self.loadTXTfilename[0] == '':
+                    return
             
-            f = open(self.loadTXTfilename[0], 'r',  encoding='utf-8')
-            self.loadTXTList = f.read().split('\n')
+                f = open(self.loadTXTfilename[0], 'r',  encoding='utf-8')
+                self.loadTXTList = f.read().split('\n')
 
-            for x in range(len(self.loadTXTList)):
-                self.loadTXTtoClear = ''.join(re.compile('[가-힣]+').findall(self.loadTXTList[x]))
-                if (len(self.loadTXTList[x]) == 2 or len(self.loadTXTList[x]) == 3):
-                    if (len(self.loadTXTtoClear) == 2 or len(self.loadTXTtoClear) == 3):
-                        self.Tab3AddItem = QListWidgetItem(self.loadTXTtoClear)
-                        self.Tab3AddItem.setTextAlignment(Qt.AlignCenter)
-                        self.Tab3AddItem.setSizeHint(QSize(0, 25))
-                        self.Tab3input1.addItem(self.Tab3AddItem)
+                for x in range(len(self.loadTXTList)):
+                    self.loadTXTtoClear = ''.join(re.compile('[가-힣]+').findall(self.loadTXTList[x]))
+                    if (len(self.loadTXTList[x]) == 2 or len(self.loadTXTList[x]) == 3):
+                        if (len(self.loadTXTtoClear) == 2 or len(self.loadTXTtoClear) == 3):
+                            self.Tab3AddItem = QListWidgetItem(self.loadTXTtoClear)
+                            self.Tab3AddItem.setTextAlignment(Qt.AlignCenter)
+                            self.Tab3AddItem.setSizeHint(QSize(0, 25))
+                            self.Tab3input1.addItem(self.Tab3AddItem)
 
             # self.Vbox1.addWidget(self.Tab3input1)
+
+        except:
+            WriteHandledError()
 
     def Tab3CSVButton1Click(self):
         self.loadCSV = QFileDialog()
@@ -1120,28 +1144,32 @@ class MainWindow(QWidget):
             # self.Vbox1.addWidget(self.Tab3input1)
 
     def Tab3TXTButton2Click(self):
-        self.loadTXT = QFileDialog()
-        self.loadTXT.setFileMode(QFileDialog.AnyFile)
-        self.loadTXTfilename = self.loadTXT.getOpenFileName(
-            caption='Open TXT file', filter="Text files (*.txt)")
+        try:
+            self.loadTXT = QFileDialog()
+            self.loadTXT.setFileMode(QFileDialog.AnyFile)
+            self.loadTXTfilename = self.loadTXT.getOpenFileName(
+                caption='Open TXT file', filter="Text files (*.txt)")
 
-        if self.loadTXTfilename:
-            if self.loadTXTfilename[0] == '':
-                return
+            if self.loadTXTfilename:
+                if self.loadTXTfilename[0] == '':
+                    return
             
-            f = open(self.loadTXTfilename[0], 'r',  encoding='utf-8')
-            self.loadTXTList = f.read().split('\n')
+                f = open(self.loadTXTfilename[0], 'r',  encoding='utf-8')
+                self.loadTXTList = f.read().split('\n')
 
-            for x in range(len(self.loadTXTList)):
-                self.loadTXTtoClear = ''.join(re.compile('[가-힣]+').findall(self.loadTXTList[x]))
-                if (len(self.loadTXTList[x]) == 2 or len(self.loadTXTList[x]) == 3):
-                    if (len(self.loadTXTtoClear) == 2 or len(self.loadTXTtoClear) == 3):
-                        self.Tab3AddItem = QListWidgetItem(self.loadTXTtoClear)
-                        self.Tab3AddItem.setTextAlignment(Qt.AlignCenter)
-                        self.Tab3AddItem.setSizeHint(QSize(0, 25))
-                        self.Tab3input2.addItem(self.Tab3AddItem)
+                for x in range(len(self.loadTXTList)):
+                    self.loadTXTtoClear = ''.join(re.compile('[가-힣]+').findall(self.loadTXTList[x]))
+                    if (len(self.loadTXTList[x]) == 2 or len(self.loadTXTList[x]) == 3):
+                        if (len(self.loadTXTtoClear) == 2 or len(self.loadTXTtoClear) == 3):
+                            self.Tab3AddItem = QListWidgetItem(self.loadTXTtoClear)
+                            self.Tab3AddItem.setTextAlignment(Qt.AlignCenter)
+                            self.Tab3AddItem.setSizeHint(QSize(0, 25))
+                            self.Tab3input2.addItem(self.Tab3AddItem)
 
             # self.Vbox2.addWidget(self.Tab3input2)
+
+        except:
+            WriteHandledError()
 
     def Tab3CSVButton2Click(self):
         self.loadCSV = QFileDialog()
