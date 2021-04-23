@@ -511,6 +511,9 @@ class MainWindow(QWidget):
 
         # self.QTab1.setLayout(self.Tab1layout)
 
+
+    def Tab1(self):
+        self.Tab1layout = QGridLayout(self)
         self.Tab1layout.setAlignment(Qt.AlignTop)
 
         self.Tab1input1 = QLineEdit()
