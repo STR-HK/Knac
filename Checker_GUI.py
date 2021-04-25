@@ -22,7 +22,15 @@ import re
 import csv
 import time
 
+import DataManager
+import Translator
 import Hangul
+
+try:
+    lang = DataManager.ReadData()['lang']
+except:
+    lang = 'en'
+    DataManager.InitData()
 
 def WriteHandledError():
     filenamae = '[Checker] Error_{}.log'.format(str(datetime.datetime.now()).replace(' ','_').replace(':','-'))
@@ -34,9 +42,9 @@ def WriteHandledError():
 
     alert = QMessageBox()
     alert.setIcon(QMessageBox.Critical)
-    alert.setWindowTitle('Error Occurred')
+    alert.setWindowTitle(Translator.translate('error', lang))
     alert.setWindowIcon(QIcon('icons/NK.png'))
-    alert.setText('Error is logged in\n{}'.format(filenamae))
+    alert.setText(Translator.translate('errorlogged', lang).format(filenamae))
     alert.setDetailedText(errormsg)
     alert.setStandardButtons(QMessageBox.Ok)
     alert.setDefaultButton(QMessageBox.Ok)
@@ -46,11 +54,11 @@ class MainWindow(QWidget):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
 
-        if (os.path.exists('mod.txt') == True):
-            self.strokeOrder = True
-        else:
+        try:
+            self.strokeOrder = DataManager.ReadData()['mode']
+        except:
             self.strokeOrder = False
-        # 다른곳에서 사용하는 변수 및 리스트 선언
+
         self.Tab2NAME1col = []
         self.Tab2NAME2col = []
         self.Tab2RESULTcol = []
@@ -82,10 +90,10 @@ class MainWindow(QWidget):
         self.QGithub = QWidget()
         # self.QDev = QWidget()
 
-        self.QTabs.addTab(self.QTab1, "𝟏 by 𝟏")
-        self.QTabs.addTab(self.QTab2, "𝟏 by 𝒏")
-        self.QTabs.addTab(self.QTab3, "𝒏 by 𝒏")
-        self.QTabs.addTab(self.QGithub, "𝐄𝐭𝐜")
+        self.QTabs.addTab(self.QTab1, Translator.translate('tab1', lang))
+        self.QTabs.addTab(self.QTab2, Translator.translate('tab2', lang))
+        self.QTabs.addTab(self.QTab3, Translator.translate('tab3', lang))
+        self.QTabs.addTab(self.QGithub, Translator.translate('etc', lang))
         # self.QTabs.addTab(self.QDev, "𝕯𝖊𝖛")
         
         self.layout.addWidget(self.QTabs)
@@ -179,12 +187,12 @@ class MainWindow(QWidget):
         elif (self.QTabs.currentIndex() == 2):
             self.Tab3analysisButton.click()
 
-    def notSupportedError(self, Shortcut1, Shortcut2):
+    def notSupportedShortcutOnThisTabError(self, Shortcut1, Shortcut2):
         self.alert = QMessageBox()
         self.alert.setIcon(QMessageBox.Information)
-        self.alert.setWindowTitle('Not Supported')
+        self.alert.setWindowTitle(Translator.translate('notsupported', lang))
         self.alert.setWindowIcon(QIcon('icons/NK.png'))
-        self.alert.setText('Not Supported Shortcut in this Tab.\nUse {} and {} to Add Name to Each Box.'.format(Shortcut1, Shortcut2))
+        self.alert.setText(Translator.translate('notsupportedshortcutonthistaberror', lang).format(Shortcut1, Shortcut2))
         self.alert.setStandardButtons(QMessageBox.Retry)
         self.alert.setDefaultButton(QMessageBox.Retry)
         self.ret = self.alert.exec_()
@@ -193,7 +201,7 @@ class MainWindow(QWidget):
         if (self.QTabs.currentIndex() == 1):
             self.Tab2AddButton.click()
         elif (self.QTabs.currentIndex() == 2):
-            self.notSupportedError('Ctrl+K','Ctrl+L')
+            self.notSupportedShortcutOnThisTabError('Ctrl+K','Ctrl+L')
 
     def Tab3Plus1(self):
         if (self.QTabs.currentIndex() == 2):
@@ -218,7 +226,7 @@ class MainWindow(QWidget):
         if (self.QTabs.currentIndex() == 1):
             self.Tab2TXTButton.click()
         elif (self.QTabs.currentIndex() == 2):
-            self.notSupportedError('Ctrl+Y','Ctrl+U')
+            self.notSupportedShortcutOnThisTabError('Ctrl+Y','Ctrl+U')
 
     def Tab3TXT1(self):
         if (self.QTabs.currentIndex() == 2):
@@ -232,7 +240,7 @@ class MainWindow(QWidget):
         if (self.QTabs.currentIndex() == 1):
             self.Tab2CSVButton.click()
         elif (self.QTabs.currentIndex() == 2):
-            self.notSupportedError('Ctrl+F','Ctrl+G')
+            self.notSupportedShortcutOnThisTabError('Ctrl+F','Ctrl+G')
 
     def Tab3CSV1(self):
         if (self.QTabs.currentIndex() == 2):
@@ -252,7 +260,7 @@ class MainWindow(QWidget):
         self.octocat.setPixmap(QPixmap(path.abspath(path.join(path.dirname(__file__), 'icons/github.png'))))
         self.octocat.setFixedSize(64, 64)
 
-        self.sourceLink = QLabel('Source Code : <a href="https://github.com/STR-HK/Knac">Repository Link</a>')
+        self.sourceLink = QLabel(Translator.translate('sourcecode', lang).format('<a href="https://github.com/STR-HK/Knac">','</a>'))
         self.sourceLink.setOpenExternalLinks(True)
 
         self.font = QLabel(self)
@@ -260,12 +268,12 @@ class MainWindow(QWidget):
         self.font.setPixmap(QPixmap(path.abspath(path.join(path.dirname(__file__), 'icons/font.png'))))
         self.font.setFixedSize(64, 64)
 
-        self.fontsourceLink = QLabel('NanumSquareOTF ac Bold : <a href="https://hangeul.naver.com/font">Site Link</a>')
+        self.fontsourceLink = QLabel(Translator.translate('font', lang).format('<a href="https://hangeul.naver.com/font">','</a>'))
         self.fontsourceLink.setOpenExternalLinks(True)
 
-        groupbox = QGroupBox('Calculate Way Settings')
-        rbtn1 = QRadioButton('By Line Number', self)
-        rbtn2 = QRadioButton('By Stroke Order', self)
+        groupbox = QGroupBox(Translator.translate('calculateway', lang))
+        rbtn1 = QRadioButton(Translator.translate('bylineorder', lang), self)
+        rbtn2 = QRadioButton(Translator.translate('bystrokeorder', lang), self)
         if self.strokeOrder == False:
             rbtn1.setChecked(True)
         elif self.strokeOrder == True:
@@ -278,23 +286,53 @@ class MainWindow(QWidget):
         vbox.addWidget(rbtn2)
         groupbox.setLayout(vbox)
 
-        self.Infolayout.addWidget(groupbox, 0, 1, 1, 3)
-        self.Infolayout.addWidget(self.font, 1, 1, 1, 1)
-        self.Infolayout.addWidget(self.fontsourceLink, 1, 2, 1, 2)
-        self.Infolayout.addWidget(self.octocat, 2, 1, 1, 1)
-        self.Infolayout.addWidget(self.sourceLink, 2, 2, 1, 2)
-        
-        
+        langSelLabel = QGroupBox(Translator.translate('langsetting', lang))
+        langSetNotice = QLabel(Translator.translate('langsetnotice', lang))
+        self.cb = QComboBox(self)
+        self.cb.addItem('English')
+        self.cb.addItem('한국어')
+
+        try:
+            if DataManager.ReadData()['lang'] == 'en':
+                self.cb.setCurrentIndex(0)
+            elif DataManager.ReadData()['lang'] == 'ko':
+                self.cb.setCurrentIndex(1)
+        except:
+            self.cb.setCurrentIndex(0)
+
+        vbox2 = QVBoxLayout()
+        vbox2.addWidget(self.cb)
+        vbox2.addWidget(langSetNotice)
+        langSelLabel.setLayout(vbox2)
+        self.cb.activated[str].connect(self.onLanguageSetted)
+
+        information = QGroupBox(Translator.translate('information', lang))
+        gbox = QGridLayout()
+        gbox.addWidget(self.font, 2, 1, 1, 1)
+        gbox.addWidget(self.fontsourceLink, 2, 2, 1, 2)
+        gbox.addWidget(self.octocat, 3, 1, 1, 1)
+        gbox.addWidget(self.sourceLink, 3, 2, 1, 2)
+
+        information.setLayout(gbox)
+
+        self.Infolayout.addWidget(information, 0, 1, 1, 3)
+        self.Infolayout.addWidget(langSelLabel, 1, 1, 1, 3)
+        self.Infolayout.addWidget(groupbox, 2, 1, 1, 3)
+
         self.QGithub.setLayout(self.Infolayout)
+
+    def onLanguageSetted(self, text):
+        if text == self.cb.itemText(0):
+            DataManager.ReplaceData('lang','en')
+        elif text == self.cb.itemText(1):
+            DataManager.ReplaceData('lang','ko')
 
     def ChangeMod(self):
         if self.strokeOrder == False:
-            f = open('mod.txt','w')
-            f.write('This File is Setting File of KNAC DON\'T Remove.')
-            f.close()
+            DataManager.ReplaceData('mode',True)
             self.strokeOrder = True
         else:
-            os.remove('mod.txt')
+            DataManager.ReplaceData('mode',False)
             self.strokeOrder = False
 
     def Dev(self):
@@ -326,9 +364,9 @@ class MainWindow(QWidget):
     def inValidMsg(self):
         self.alert = QMessageBox()
         self.alert.setIcon(QMessageBox.Critical)
-        self.alert.setWindowTitle('Invalid Input')
+        self.alert.setWindowTitle(Translator.translate('invalidinput', lang))
         self.alert.setWindowIcon(QIcon(path.abspath(path.join(path.dirname(__file__), 'icons/NK.png'))))
-        self.alert.setText('Invalid Input. Please Retry.\nCondition : KR 2 or 3 Letter')
+        self.alert.setText(Translator.translate('invalidmsg', lang))
         self.alert.setStandardButtons(QMessageBox.Retry)
         self.alert.setDefaultButton(QMessageBox.Retry)
         self.ret = self.alert.exec_()
@@ -531,17 +569,17 @@ class MainWindow(QWidget):
 
         self.Tab1input1 = QLineEdit()
         self.Tab1input1.setAlignment(QtCore.Qt.AlignCenter)
-        self.Tab1input1.setPlaceholderText("NAME 1")
+        self.Tab1input1.setPlaceholderText(Translator.translate('name1', lang))
         self.Tab1input1.setFixedHeight(32)
         self.Tab1input1.editingFinished.connect(self.Tab1input1Fin)
 
         self.Tab1input2 = QLineEdit()
         self.Tab1input2.setAlignment(QtCore.Qt.AlignCenter)
-        self.Tab1input2.setPlaceholderText("NAME 2")
+        self.Tab1input2.setPlaceholderText(Translator.translate('name2', lang))
         self.Tab1input2.setFixedHeight(32)
         self.Tab1input2.editingFinished.connect(self.Tab1input2Fin)
 
-        self.Tab1analysisButton = QPushButton('Analysis')
+        self.Tab1analysisButton = QPushButton(Translator.translate('analysis', lang))
         self.Tab1analysisButton.setFixedHeight(32)
         self.Tab1analysisButton.clicked.connect(self.Tab1ButtonClick)
 
@@ -716,14 +754,14 @@ class MainWindow(QWidget):
 
         self.Tab2input1 = QLineEdit()
         self.Tab2input1.setAlignment(QtCore.Qt.AlignCenter)
-        self.Tab2input1.setPlaceholderText("NAME 1")
+        self.Tab2input1.setPlaceholderText(Translator.translate('name1', lang))
         self.Tab2input1.setFixedHeight(40)
         self.Tab2input1.editingFinished.connect(self.Tab2input1Fin)
 
         self.Tab2input2 = QListWidget()
         self.Tab2input2.setFixedHeight(128)
 
-        self.Tab2analysisButton = QPushButton('Analysis')
+        self.Tab2analysisButton = QPushButton(Translator.translate('analysis', lang))
         self.Tab2analysisButton.setFixedHeight(32)
         self.Tab2analysisButton.clicked.connect(self.Tab2ButtonClick)
 
@@ -757,9 +795,9 @@ class MainWindow(QWidget):
         if (self.Tab2NAME1col == []):
             self.alert = QMessageBox()
             self.alert.setIcon(QMessageBox.Critical)
-            self.alert.setWindowTitle('No Data Exists')
+            self.alert.setWindowTitle(Translator.translate('nodata', lang))
             self.alert.setWindowIcon(QIcon(path.abspath(path.join(path.dirname(__file__), 'icons/NK.png'))))
-            self.alert.setText('No Data Exists.\nPlease Analysis First.')
+            self.alert.setText(Translator.translate('nodatamsg', lang))
             self.alert.setStandardButtons(QMessageBox.Retry)
             self.alert.setDefaultButton(QMessageBox.Retry)
             self.ret = self.alert.exec_()
@@ -833,7 +871,7 @@ class MainWindow(QWidget):
             # self.QTab2.setLayout(self.Tab2layout)
 
     def Tab2AddClick(self):
-        text, ok = QInputDialog.getText(self, 'Add Dialog', 'Enter text:')
+        text, ok = QInputDialog.getText(self, Translator.translate('adddialog', lang), Translator.translate('entertext', lang))
         if (ok):
             self.Tab2name2AddtoList = []
             self.Tab2name2AddtoList = re.compile('[가-힣]+').findall(str(text))
@@ -955,8 +993,8 @@ class MainWindow(QWidget):
         self.Tab3layout = QGridLayout(self)
         self.Tab3layout.setAlignment(Qt.AlignTop)
 
-        self.GroupBox1 = QGroupBox('NAME 1')
-        self.GroupBox2 = QGroupBox('NAME 2')
+        self.GroupBox1 = QGroupBox(Translator.translate('name1', lang))
+        self.GroupBox2 = QGroupBox(Translator.translate('name2', lang))
         self.Hbox1 = QHBoxLayout()
         self.Hbox15 = QHBoxLayout()
         self.Hbox2 = QHBoxLayout()
@@ -1028,12 +1066,12 @@ class MainWindow(QWidget):
         self.Vbox1.addWidget(self.Tab3input1)
         self.Vbox2.addWidget(self.Tab3input2)
 
-        self.Tab3DuplicateCheckBox = QPushButton('Duplicate\nL to R')
+        self.Tab3DuplicateCheckBox = QPushButton(Translator.translate('duplicate', lang))
         self.Tab3DuplicateCheckBox.setStyleSheet('font-size: 11px')
         self.Tab3DuplicateCheckBox.setFixedHeight(32)
         self.Tab3DuplicateCheckBox.clicked.connect(self.Duplicate)
 
-        self.Tab3analysisButton = QPushButton('Analysis (It will take some time)')
+        self.Tab3analysisButton = QPushButton(Translator.translate('analysistaketime', lang))
         self.Tab3analysisButton.setFixedHeight(32)
         self.Tab3analysisButton.clicked.connect(self.Tab3ButtonClick)
 
@@ -1060,9 +1098,9 @@ class MainWindow(QWidget):
         if (self.Tab3NAME1col == [] or self.Tab3NAME2col == []):
             self.alert = QMessageBox()
             self.alert.setIcon(QMessageBox.Critical)
-            self.alert.setWindowTitle('No Data Exists')
+            self.alert.setWindowTitle(Translator.translate('nodata', lang))
             self.alert.setWindowIcon(QIcon(path.abspath(path.join(path.dirname(__file__), 'icons/NK.png'))))
-            self.alert.setText('No Data Exists.\nPlease Analysis First.')
+            self.alert.setText(Translator.translate('nodatamsg', lang))
             self.alert.setStandardButtons(QMessageBox.Retry)
             self.alert.setDefaultButton(QMessageBox.Retry)
             self.ret = self.alert.exec_()
@@ -1196,7 +1234,7 @@ class MainWindow(QWidget):
             # self.Vbox2.addWidget(self.Tab3input2)
 
     def Tab3AddButton1Click(self):
-        text, ok = QInputDialog.getText(self, 'Add Dialog', 'Enter text:')
+        text, ok = QInputDialog.getText(self, Translator.translate('adddialog', lang), Translator.translate('entertext', lang))
         if (ok):
             self.Tab3name1AddtoList = []
             self.Tab3name1AddtoList = re.compile('[가-힣]+').findall(str(text))
@@ -1219,7 +1257,7 @@ class MainWindow(QWidget):
             self.Tab3input1.takeItem(self.Tab3input1.row(item))
 
     def Tab3AddButton2Click(self):
-        text, ok = QInputDialog.getText(self, 'Add Dialog', 'Enter text:')
+        text, ok = QInputDialog.getText(self, Translator.translate('adddialog', lang), Translator.translate('entertext', lang))
         if (ok):
             self.Tab3name1AddtoList = []
             self.Tab3name1AddtoList = re.compile('[가-힣]+').findall(str(text))
