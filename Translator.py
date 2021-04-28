@@ -1,3 +1,27 @@
+from PyQt5.QtWidgets import QMessageBox
+from PyQt5.QtGui import QIcon
+import traceback
+import datetime
+import sys
+
+def WriteHandledError():
+    filenamae = '[Checker] Error_{}.log'.format(str(datetime.datetime.now()).replace(' ','_').replace(':','-'))
+    errormsg = str(traceback.format_exc())
+
+    f = open(filenamae, 'w')
+    f.write(errormsg)
+    f.close()
+
+    alert = QMessageBox()
+    alert.setIcon(QMessageBox.Critical)
+    alert.setWindowTitle(translate('error', 'en'))
+    alert.setWindowIcon(QIcon('icons/NK.png'))
+    alert.setText(translate('errorlogged', 'en').format(filenamae))
+    alert.setDetailedText(errormsg)
+    alert.setStandardButtons(QMessageBox.Ok)
+    alert.setDefaultButton(QMessageBox.Ok)
+    ret = alert.exec_()
+
 dic = [
     ['error','Error Occurred','에러 발생'],
     ['errorlogged','Error is logged in File:\n{}','에러가 다음 파일에 수집되었습니다 :\n{}'],
@@ -30,11 +54,17 @@ dic = [
 ]
 
 def translate(tag, lang):
-    if lang == 'en':
-        codit = 1
-    elif lang == 'ko':
-        codit = 2
+    try:
+        if lang == 'en':
+            langaugeNumber = 1
+        elif lang == 'ko':
+            langaugeNumber = 2
+        else:
+            langaugeNumber = None
 
-    for d in dic:
-        if d[0] == tag:
-            return d[codit]
+        for data in dic:
+            if data[0] == tag:
+                return data[langaugeNumber]
+    except:
+        WriteHandledError()
+        sys.exit()
