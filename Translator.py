@@ -16,7 +16,7 @@ def WriteHandledError():
     alert.setIcon(QMessageBox.Critical)
     alert.setWindowTitle(translate('error', 'en'))
     alert.setWindowIcon(QIcon('icons/NK.png'))
-    alert.setText(translate('errorlogged', 'en').format(filenamae))
+    alert.setText('❰ CheckerData.ini {\"lang\"} Error ❱\n\n' + translate('errorlogged', 'en').format(filenamae))
     alert.setDetailedText(errormsg)
     alert.setStandardButtons(QMessageBox.Ok)
     alert.setDefaultButton(QMessageBox.Ok)
@@ -50,7 +50,7 @@ dic = [
     ['entertext','Enter text :','텍스트를 입력하세요 :'],
     ['langsetting','Language Setting','언어 설정'],
     ['langsetnotice','You Need to Restart Program to Update Language.','프로그램을 재시작해야 언어가 변경됩니다.'],
-    ['information','Information','정보']
+    ['information','Information','정보'],
 ]
 
 def translate(tag, lang):

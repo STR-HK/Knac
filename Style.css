@@ -1,0 +1,92 @@
+QPushButton {
+    background-color: white;
+    border-radius: 3px;
+    border: 2px solid #A19BFE;
+    /* border: none; */
+    padding: 5px;
+    outline: 0;
+}
+
+QLineEdit {
+    border: 2px solid lightgray;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    border-bottom-color: #A19BFE;
+}
+
+QListWidget {
+    border: 2px solid lightgray;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    border-bottom-color: #A19BFE;
+}
+
+QTabBar::tab {
+    background-color: #bebaff;
+    outline: none;
+}
+
+QTabBar::tab:selected {
+    background-color: #a49cff;
+}
+
+QTabWidget {
+    border: none;
+    border-bottom: none;
+}
+
+QComboBox {
+    background-color: #A19BFE;
+    border: 1px solid #A19BFE;
+}
+
+QComboBox QAbstractItemView {
+    selection-background-color: #bebaff;
+    selection-color: black;
+    color: black;
+    background-color: white;
+    outline: 0px;
+}
+
+QRadioButton::indicator:unchecked:hover {
+    border: 1px solid #A19BFE;
+    border-radius: 5px;
+}
+
+QRadioButton::indicator:checked {
+    background-color: #A19BFE;
+    border: 1px solid #A19BFE;
+    border-radius: 5px;
+}
+
+QLabel {
+    border-radius: 2px;
+}
+
+QTableWidget {
+    border: 2px solid lightgray;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    border-bottom-color: #A19BFE;
+    selection-color: black;
+    selection-background-color: #bebaff;
+    /* alternate-background-color: #bebaff; */
+}
+
+QHeaderView {
+    background-color: white;
+}
+
+QHeaderView::section:hover {
+    background-color: #dbd9ff;
+    border: none;
+}
+
+QHeaderView::section:checked {
+    background-color: #dbd9ff;
+    border: none;
+}
+
+QTableWidget QTableCornerButton::section:checked {
+    background-color: #dbd9ff;
+}

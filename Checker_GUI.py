@@ -1,3 +1,4 @@
+from PyQt5 import QtGui
 from PyQt5.QtCore import QDateTime, Qt, QTimer, QSize, QTextStream, QFile, reset
 from PyQt5.QtWidgets import (QApplication, QCheckBox, QComboBox, QDateTimeEdit,
         QDial, QDialog, QGridLayout, QGroupBox, QHBoxLayout, QLabel, QLineEdit,
@@ -41,14 +42,19 @@ def WriteHandledError():
     f.close()
 
     alert = QMessageBox()
+    alert.setFont(app.font())
     alert.setIcon(QMessageBox.Critical)
+    alert.setIconPixmap(QPixmap(errorIcon))
     alert.setWindowTitle(Translator.translate('error', lang))
-    alert.setWindowIcon(QIcon('icons/NK.png'))
+    alert.setWindowIcon(QIcon(iconfilename))
     alert.setText(Translator.translate('errorlogged', lang).format(filenamae))
     alert.setDetailedText(errormsg)
     alert.setStandardButtons(QMessageBox.Ok)
     alert.setDefaultButton(QMessageBox.Ok)
     ret = alert.exec_()
+
+errorIcon = path.abspath(path.join(path.dirname(__file__), 'icons/Warning.svg'))
+iconfilename = path.abspath(path.join(path.dirname(__file__), 'icons/NewNK.svg'))
 
 class MainWindow(QWidget):
     def __init__(self, parent=None):
@@ -70,10 +76,10 @@ class MainWindow(QWidget):
         self.Tab3NAME1Count = 0
         self.Tab3NAME2Count = 0
 
+        # self.setWindowFlag(Qt.FramelessWindowHint)
         self.setWindowTitle('Korean Name Compatibility Checker GUI')
-        self.iconfilename = path.abspath(path.join(path.dirname(__file__), 'icons/NK.png'))
 
-        self.setWindowIcon(QIcon(self.iconfilename))
+        self.setWindowIcon(QIcon(iconfilename))
         self.resize(500, 650)
 
         self.geometryInfo = self.frameGeometry()
@@ -81,7 +87,7 @@ class MainWindow(QWidget):
         self.geometryInfo.moveCenter(self.centerpoint)
         self.move(self.geometryInfo.topLeft())
 
-        self.layout = QVBoxLayout(self)
+        self.layout = QVBoxLayout()
 
         self.QTabs = QTabWidget()
         self.QTab1 = QWidget()
@@ -189,9 +195,11 @@ class MainWindow(QWidget):
 
     def notSupportedShortcutOnThisTabError(self, Shortcut1, Shortcut2):
         self.alert = QMessageBox()
+        self.alert.setFont(app.font())
         self.alert.setIcon(QMessageBox.Information)
+        self.alert.setIconPixmap(QPixmap(errorIcon))
         self.alert.setWindowTitle(Translator.translate('notsupported', lang))
-        self.alert.setWindowIcon(QIcon('icons/NK.png'))
+        self.alert.setWindowIcon(QIcon(iconfilename))
         self.alert.setText(Translator.translate('notsupportedshortcutonthistaberror', lang).format(Shortcut1, Shortcut2))
         self.alert.setStandardButtons(QMessageBox.Retry)
         self.alert.setDefaultButton(QMessageBox.Retry)
@@ -251,11 +259,11 @@ class MainWindow(QWidget):
             self.Tab3CSVButton2.click()
 
     def Info(self):
-        self.Infolayout = QGridLayout(self)
+        self.Infolayout = QGridLayout()
         self.Infolayout.setAlignment(Qt.AlignTop)
         # self.Infolayout.setAlignment(Qt.AlignHCenter | Qt.AlignTop)
 
-        self.octocat = QLabel(self)
+        self.octocat = QLabel()
         self.octocat.setScaledContents(True)
         self.octocat.setPixmap(QPixmap(path.abspath(path.join(path.dirname(__file__), 'icons/github.png'))))
         self.octocat.setFixedSize(64, 64)
@@ -263,7 +271,7 @@ class MainWindow(QWidget):
         self.sourceLink = QLabel(Translator.translate('sourcecode', lang).format('<a href="https://github.com/STR-HK/Knac">','</a>'))
         self.sourceLink.setOpenExternalLinks(True)
 
-        self.font = QLabel(self)
+        self.font = QLabel()
         self.font.setScaledContents(True)
         self.font.setPixmap(QPixmap(path.abspath(path.join(path.dirname(__file__), 'icons/font.png'))))
         self.font.setFixedSize(64, 64)
@@ -288,7 +296,7 @@ class MainWindow(QWidget):
 
         langSelLabel = QGroupBox(Translator.translate('langsetting', lang))
         langSetNotice = QLabel(Translator.translate('langsetnotice', lang))
-        self.cb = QComboBox(self)
+        self.cb = QComboBox()
         self.cb.addItem('English')
         self.cb.addItem('한국어')
 
@@ -315,9 +323,13 @@ class MainWindow(QWidget):
 
         information.setLayout(gbox)
 
+        # self.colorCheck = QCheckBox('')
+        # self.colorCheck.clicked.connect()
+
         self.Infolayout.addWidget(information, 0, 1, 1, 3)
         self.Infolayout.addWidget(langSelLabel, 1, 1, 1, 3)
         self.Infolayout.addWidget(groupbox, 2, 1, 1, 3)
+        # self.Infolayout.addWidget(self.colorCheck, 3, 1, 1, 3)
 
         self.QGithub.setLayout(self.Infolayout)
 
@@ -363,9 +375,11 @@ class MainWindow(QWidget):
 
     def inValidMsg(self):
         self.alert = QMessageBox()
+        self.alert.setFont(app.font())
         self.alert.setIcon(QMessageBox.Critical)
+        self.alert.setIconPixmap(QPixmap(errorIcon))
         self.alert.setWindowTitle(Translator.translate('invalidinput', lang))
-        self.alert.setWindowIcon(QIcon(path.abspath(path.join(path.dirname(__file__), 'icons/NK.png'))))
+        self.alert.setWindowIcon(QIcon(iconfilename))
         self.alert.setText(Translator.translate('invalidmsg', lang))
         self.alert.setStandardButtons(QMessageBox.Retry)
         self.alert.setDefaultButton(QMessageBox.Retry)
@@ -373,135 +387,164 @@ class MainWindow(QWidget):
 
     def Tab1Ready(self):
         # Tab1의 보여주기 트리 생성
-        self.Tab1TreeLayer1 = QGridLayout(self)
-        self.Tab1TreeLayer2 = QGridLayout(self)
-        self.Tab1TreeLayer3 = QGridLayout(self)
-        self.Tab1TreeLayer4 = QGridLayout(self)
-        self.Tab1TreeLayer5 = QGridLayout(self)
-        self.Tab1TreeLayer6 = QGridLayout(self)
+        self.Tab1TreeLayer1 = QGridLayout()
+        self.Tab1TreeLayer2 = QGridLayout()
+        self.Tab1TreeLayer3 = QGridLayout()
+        self.Tab1TreeLayer4 = QGridLayout()
+        self.Tab1TreeLayer5 = QGridLayout()
+        self.Tab1TreeLayer6 = QGridLayout()
 
+        self.binary = 'white'
+
+        # self.primary = '#F0F0F0'
+        # self.secondary = '#E0E0E0'
+        # self.tertiary = '#DCDCDC'
+        # self.quaternary = '#D8D8D8'
+        # self.quinary = '#D3D3D3'
+        # self.senary = '#D0D0D0'
+
+        self.primary = '#e5e3ff'
+        self.secondary = '#d9d6ff'
+        self.tertiary = '#cfccff'
+        self.quaternary = '#bebaff'
+        self.quinary = '#b2adff'
+        self.senary = '#a19bfe'
+
+        # 첫번째 줄 6개 (이름 교차배치)
         self.Tab1TreeLayer1Text1 = QLabel(' ')
-        self.Tab1TreeLayer1Text1.setStyleSheet('font-size: 20px;''padding : 5px;''background-color: #E8E8E8')
+        self.Tab1TreeLayer1Text1.setStyleSheet('font-size: 20px;''padding : 5px;''background-color: {}'.format(self.primary))
         self.Tab1TreeLayer1Text1.setAlignment(QtCore.Qt.AlignCenter)
         self.Tab1TreeLayer1Text2 = QLabel(' ')
-        self.Tab1TreeLayer1Text2.setStyleSheet('font-size: 20px;''padding : 5px;''background-color: #F0F0F0')
+        self.Tab1TreeLayer1Text2.setStyleSheet('font-size: 20px;''padding : 5px;''background-color: {}'.format(self.primary))
         self.Tab1TreeLayer1Text2.setAlignment(QtCore.Qt.AlignCenter)
         self.Tab1TreeLayer1Text3 = QLabel(' ')
-        self.Tab1TreeLayer1Text3.setStyleSheet('font-size: 20px;''padding : 5px;''background-color: #F0F0F0')
+        self.Tab1TreeLayer1Text3.setStyleSheet('font-size: 20px;''padding : 5px;''background-color: {}'.format(self.primary))
         self.Tab1TreeLayer1Text3.setAlignment(QtCore.Qt.AlignCenter)
         self.Tab1TreeLayer1Text4 = QLabel(' ')
-        self.Tab1TreeLayer1Text4.setStyleSheet('font-size: 20px;''padding : 5px;''background-color: #F0F0F0')
+        self.Tab1TreeLayer1Text4.setStyleSheet('font-size: 20px;''padding : 5px;''background-color: {}'.format(self.primary))
         self.Tab1TreeLayer1Text4.setAlignment(QtCore.Qt.AlignCenter)
         self.Tab1TreeLayer1Text5 = QLabel(' ')
-        self.Tab1TreeLayer1Text5.setStyleSheet('font-size: 20px;''padding : 5px;''background-color: #F0F0F0')
+        self.Tab1TreeLayer1Text5.setStyleSheet('font-size: 20px;''padding : 5px;''background-color: {}'.format(self.primary))
         self.Tab1TreeLayer1Text5.setAlignment(QtCore.Qt.AlignCenter)
         self.Tab1TreeLayer1Text6 = QLabel(' ')
-        self.Tab1TreeLayer1Text6.setStyleSheet('font-size: 20px;''padding : 5px;''background-color: #F0F0F0')
+        self.Tab1TreeLayer1Text6.setStyleSheet('font-size: 20px;''padding : 5px;''background-color: {}'.format(self.primary))
         self.Tab1TreeLayer1Text6.setAlignment(QtCore.Qt.AlignCenter)
+
+        # 두번쨰 줄 6개 (문자 -> 숫자 변환 작업물)
         self.Tab1TreeLayer2Text1 = QLabel(' ')
-        self.Tab1TreeLayer2Text1.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: #E0E0E0')
+        self.Tab1TreeLayer2Text1.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: {}'.format(self.secondary))
         self.Tab1TreeLayer2Text1.setAlignment(QtCore.Qt.AlignCenter)
         self.Tab1TreeLayer2Text2 = QLabel(' ')
-        self.Tab1TreeLayer2Text2.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: #E0E0E0')
+        self.Tab1TreeLayer2Text2.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: {}'.format(self.secondary))
         self.Tab1TreeLayer2Text2.setAlignment(QtCore.Qt.AlignCenter)
         self.Tab1TreeLayer2Text3 = QLabel(' ')
-        self.Tab1TreeLayer2Text3.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: #E0E0E0')
+        self.Tab1TreeLayer2Text3.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: {}'.format(self.secondary))
         self.Tab1TreeLayer2Text3.setAlignment(QtCore.Qt.AlignCenter)
         self.Tab1TreeLayer2Text4 = QLabel(' ')
-        self.Tab1TreeLayer2Text4.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: #E0E0E0')
+        self.Tab1TreeLayer2Text4.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: {}'.format(self.secondary))
         self.Tab1TreeLayer2Text4.setAlignment(QtCore.Qt.AlignCenter)
         self.Tab1TreeLayer2Text5 = QLabel(' ')
-        self.Tab1TreeLayer2Text5.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: #E0E0E0')
+        self.Tab1TreeLayer2Text5.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: {}'.format(self.secondary))
         self.Tab1TreeLayer2Text5.setAlignment(QtCore.Qt.AlignCenter)
         self.Tab1TreeLayer2Text6 = QLabel(' ')
-        self.Tab1TreeLayer2Text6.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: #E0E0E0')
+        self.Tab1TreeLayer2Text6.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: {}'.format(self.secondary))
         self.Tab1TreeLayer2Text6.setAlignment(QtCore.Qt.AlignCenter)
+
+        # 세번쨰 줄 11개 (두번째 줄 아이템 사이 밑에 배치하기 위한 색 엇갈림 작업물)
+        # 무효 / 유효 / 무효 / 유효 / 무효 / 유효 / 무효 / 유효 / 무효 / 유효 / 무효
         self.Tab1TreeLayer3Text0 = QLabel(' ')
-        self.Tab1TreeLayer3Text0.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: white')
+        self.Tab1TreeLayer3Text0.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: {}'.format(self.binary))
         self.Tab1TreeLayer3Text0.setAlignment(QtCore.Qt.AlignCenter)
         self.Tab1TreeLayer3Text1 = QLabel(' ')
-        self.Tab1TreeLayer3Text1.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: #DCDCDC')
+        self.Tab1TreeLayer3Text1.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: {}'.format(self.tertiary))
         self.Tab1TreeLayer3Text1.setAlignment(QtCore.Qt.AlignCenter)
         self.Tab1TreeLayer3Text15 = QLabel(' ')
-        self.Tab1TreeLayer3Text15.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: white')
+        self.Tab1TreeLayer3Text15.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: {}'.format(self.binary))
         self.Tab1TreeLayer3Text15.setAlignment(QtCore.Qt.AlignCenter)
         self.Tab1TreeLayer3Text2 = QLabel(' ')
-        self.Tab1TreeLayer3Text2.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: #DCDCDC')
+        self.Tab1TreeLayer3Text2.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: {}'.format(self.tertiary))
         self.Tab1TreeLayer3Text2.setAlignment(QtCore.Qt.AlignCenter)
         self.Tab1TreeLayer3Text25 = QLabel(' ')
-        self.Tab1TreeLayer3Text25.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: white')
+        self.Tab1TreeLayer3Text25.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: {}'.format(self.binary))
         self.Tab1TreeLayer3Text25.setAlignment(QtCore.Qt.AlignCenter)
         self.Tab1TreeLayer3Text3 = QLabel(' ')
-        self.Tab1TreeLayer3Text3.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: #DCDCDC')
+        self.Tab1TreeLayer3Text3.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: {}'.format(self.tertiary))
         self.Tab1TreeLayer3Text3.setAlignment(QtCore.Qt.AlignCenter)
         self.Tab1TreeLayer3Text35 = QLabel(' ')
-        self.Tab1TreeLayer3Text35.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: white')
+        self.Tab1TreeLayer3Text35.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: {}'.format(self.binary))
         self.Tab1TreeLayer3Text35.setAlignment(QtCore.Qt.AlignCenter)
         self.Tab1TreeLayer3Text4 = QLabel(' ')
-        self.Tab1TreeLayer3Text4.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: #DCDCDC')
+        self.Tab1TreeLayer3Text4.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: {}'.format(self.tertiary))
         self.Tab1TreeLayer3Text4.setAlignment(QtCore.Qt.AlignCenter)
         self.Tab1TreeLayer3Text45 = QLabel(' ')
-        self.Tab1TreeLayer3Text45.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: white')
+        self.Tab1TreeLayer3Text45.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: {}'.format(self.binary))
         self.Tab1TreeLayer3Text45.setAlignment(QtCore.Qt.AlignCenter)
         self.Tab1TreeLayer3Text5 = QLabel(' ')
-        self.Tab1TreeLayer3Text5.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: #DCDCDC')
+        self.Tab1TreeLayer3Text5.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: {}'.format(self.tertiary))
         self.Tab1TreeLayer3Text5.setAlignment(QtCore.Qt.AlignCenter)
         self.Tab1TreeLayer3Text55 = QLabel(' ')
-        self.Tab1TreeLayer3Text55.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: white')
+        self.Tab1TreeLayer3Text55.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: {}'.format(self.binary))
         self.Tab1TreeLayer3Text55.setAlignment(QtCore.Qt.AlignCenter)
+
+        # 네번쨰 줄 6개 (세번째 줄 아이템 사이 밑에 배치하기 위해 색을 엇갈림)
+        # 무효 / 유효 / 유효 / 유효 / 유효 / 무효
         self.Tab1TreeLayer4Text0 = QLabel(' ')
-        self.Tab1TreeLayer4Text0.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: white')
+        self.Tab1TreeLayer4Text0.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: {}'.format(self.binary))
         self.Tab1TreeLayer4Text0.setAlignment(QtCore.Qt.AlignCenter)
         self.Tab1TreeLayer4Text1 = QLabel(' ')
-        self.Tab1TreeLayer4Text1.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: #D8D8D8')
+        self.Tab1TreeLayer4Text1.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: {}'.format(self.quaternary))
         self.Tab1TreeLayer4Text1.setAlignment(QtCore.Qt.AlignCenter)
         self.Tab1TreeLayer4Text2 = QLabel(' ')
-        self.Tab1TreeLayer4Text2.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: #D8D8D8')
+        self.Tab1TreeLayer4Text2.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: {}'.format(self.quaternary))
         self.Tab1TreeLayer4Text2.setAlignment(QtCore.Qt.AlignCenter)
         self.Tab1TreeLayer4Text3 = QLabel(' ')
-        self.Tab1TreeLayer4Text3.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: #D8D8D8')
+        self.Tab1TreeLayer4Text3.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: {}'.format(self.quaternary))
         self.Tab1TreeLayer4Text3.setAlignment(QtCore.Qt.AlignCenter)
         self.Tab1TreeLayer4Text4 = QLabel(' ')
-        self.Tab1TreeLayer4Text4.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: #D8D8D8')
+        self.Tab1TreeLayer4Text4.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: {}'.format(self.quaternary))
         self.Tab1TreeLayer4Text4.setAlignment(QtCore.Qt.AlignCenter)
         self.Tab1TreeLayer4Text5 = QLabel(' ')
-        self.Tab1TreeLayer4Text5.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: white')
+        self.Tab1TreeLayer4Text5.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: {}'.format(self.binary))
         self.Tab1TreeLayer4Text5.setAlignment(QtCore.Qt.AlignCenter)
+
+        # 다섯번째 줄 
         self.Tab1TreeLayer5Text0 = QLabel(' ')
-        self.Tab1TreeLayer5Text0.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: white')
+        self.Tab1TreeLayer5Text0.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: {}'.format(self.binary))
         self.Tab1TreeLayer5Text0.setAlignment(QtCore.Qt.AlignCenter)
         self.Tab1TreeLayer5Text1 = QLabel(' ')
-        self.Tab1TreeLayer5Text1.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: white')
+        self.Tab1TreeLayer5Text1.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: {}'.format(self.binary))
         self.Tab1TreeLayer5Text1.setAlignment(QtCore.Qt.AlignCenter)
         self.Tab1TreeLayer5Text2 = QLabel(' ')
-        self.Tab1TreeLayer5Text2.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: #D3D3D3')
+        self.Tab1TreeLayer5Text2.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: {}'.format(self.quinary))
         self.Tab1TreeLayer5Text2.setAlignment(QtCore.Qt.AlignCenter)
         self.Tab1TreeLayer5Text3 = QLabel(' ')
-        self.Tab1TreeLayer5Text3.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: #D3D3D3')
+        self.Tab1TreeLayer5Text3.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: {}'.format(self.quinary))
         self.Tab1TreeLayer5Text3.setAlignment(QtCore.Qt.AlignCenter)
         self.Tab1TreeLayer5Text4 = QLabel(' ')
-        self.Tab1TreeLayer5Text4.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: #D3D3D3')
+        self.Tab1TreeLayer5Text4.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: {}'.format(self.quinary))
         self.Tab1TreeLayer5Text4.setAlignment(QtCore.Qt.AlignCenter)
         self.Tab1TreeLayer5Text5 = QLabel(' ')
-        self.Tab1TreeLayer5Text5.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: white')
+        self.Tab1TreeLayer5Text5.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: {}'.format(self.binary))
         self.Tab1TreeLayer5Text5.setAlignment(QtCore.Qt.AlignCenter)
         self.Tab1TreeLayer5Text6 = QLabel(' ')
-        self.Tab1TreeLayer5Text6.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: white')
+        self.Tab1TreeLayer5Text6.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: {}'.format(self.binary))
         self.Tab1TreeLayer5Text6.setAlignment(QtCore.Qt.AlignCenter)
+
+        # 마지막(여섯)번쨰 줄
         self.Tab1TreeLayer6Text0 = QLabel(' ')
-        self.Tab1TreeLayer6Text0.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: white')
+        self.Tab1TreeLayer6Text0.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: {}'.format(self.binary))
         self.Tab1TreeLayer6Text0.setAlignment(QtCore.Qt.AlignCenter)
         self.Tab1TreeLayer6Text1 = QLabel(' ')
-        self.Tab1TreeLayer6Text1.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: white')
+        self.Tab1TreeLayer6Text1.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: {}'.format(self.binary))
         self.Tab1TreeLayer6Text1.setAlignment(QtCore.Qt.AlignCenter)
         self.Tab1TreeLayer6Text2 = QLabel(' ')
-        self.Tab1TreeLayer6Text2.setStyleSheet('font-size: 25px;''padding-top : 2.5px;''padding-bottom : 2.5px;''background-color: #D0D0D0')
+        self.Tab1TreeLayer6Text2.setStyleSheet('font-size: 25px;''padding-top : 2.5px;''padding-bottom : 2.5px;''background-color: {}'.format(self.senary))
         self.Tab1TreeLayer6Text2.setAlignment(QtCore.Qt.AlignCenter)
         self.Tab1TreeLayer6Text3 = QLabel(' ')
-        self.Tab1TreeLayer6Text3.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: white')
+        self.Tab1TreeLayer6Text3.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: {}'.format(self.binary))
         self.Tab1TreeLayer6Text3.setAlignment(QtCore.Qt.AlignCenter)
         self.Tab1TreeLayer6Text4 = QLabel(' ')
-        self.Tab1TreeLayer6Text4.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: white')
+        self.Tab1TreeLayer6Text4.setStyleSheet('font-size: 15px;''padding-top : 2px;''padding-bottom : 1px;''background-color: {}'.format(self.binary))
         self.Tab1TreeLayer6Text4.setAlignment(QtCore.Qt.AlignCenter)
 
         self.Tab1TreeLayer1.addWidget(self.Tab1TreeLayer1Text1, 0, 0)
@@ -562,32 +605,31 @@ class MainWindow(QWidget):
 
         # self.QTab1.setLayout(self.Tab1layout)
 
-
     def Tab1(self):
-        self.Tab1layout = QGridLayout(self)
+        self.Tab1layout = QGridLayout()
         self.Tab1layout.setAlignment(Qt.AlignTop)
 
         self.Tab1input1 = QLineEdit()
         self.Tab1input1.setAlignment(QtCore.Qt.AlignCenter)
         self.Tab1input1.setPlaceholderText(Translator.translate('name1', lang))
-        self.Tab1input1.setFixedHeight(32)
+        self.Tab1input1.setFixedHeight(35)
         self.Tab1input1.editingFinished.connect(self.Tab1input1Fin)
+        self.Tab1input1.selectionChanged.connect(self.OutFocus)
 
         self.Tab1input2 = QLineEdit()
         self.Tab1input2.setAlignment(QtCore.Qt.AlignCenter)
         self.Tab1input2.setPlaceholderText(Translator.translate('name2', lang))
-        self.Tab1input2.setFixedHeight(32)
+        self.Tab1input2.setFixedHeight(35)
         self.Tab1input2.editingFinished.connect(self.Tab1input2Fin)
 
         self.Tab1analysisButton = QPushButton(Translator.translate('analysis', lang))
+        self.Tab1analysisButton.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.Tab1analysisButton.setFixedHeight(32)
         self.Tab1analysisButton.clicked.connect(self.Tab1ButtonClick)
 
-        
-
         self.Tab1Blank = QLabel('\n')
 
-        self.Tab1Tree = QGridLayout(self)
+        self.Tab1Tree = QGridLayout()
         self.Tab1Tree.setAlignment(Qt.AlignTop)
 
         self.Tab1layout.addWidget(self.Tab1input1, 0, 0)
@@ -600,14 +642,18 @@ class MainWindow(QWidget):
         # 최종 반영
         self.QTab1.setLayout(self.Tab1layout)
 
+    def OutFocus(self):
+        print('out')
+
     def Tab1input1Fin(self):
         self.Tab1input2.setFocus()
         self.Tab1input2.selectAll()
 
     def Tab1input2Fin(self):
-        self.Tab1analysisButton.click()
-        self.Tab1input1.setFocus()
-        self.Tab1input1.selectAll()
+        print('Tab1input2Fin')
+        # self.Tab1analysisButton.click()
+        # self.Tab1input1.setFocus()
+        # self.Tab1input1.selectAll()
 
     def Tab1ButtonClick(self):
         self.Tab1name1list = re.compile('[가-힣]+').findall(self.Tab1input1.text())
@@ -729,27 +775,31 @@ class MainWindow(QWidget):
         self.Tab1TreeLayer6Text4.setText(' ')
 
     def Tab2(self):
-        self.Tab2layout = QGridLayout(self)
+        self.Tab2layout = QGridLayout()
         self.Tab2layout.setAlignment(Qt.AlignTop)
 
         self.Tab2TXTButton = QPushButton()
+        self.Tab2TXTButton.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.Tab2TXTButton.setText('TXT')
-        self.Tab2TXTButton.setFixedHeight(20)
+        self.Tab2TXTButton.setFixedHeight(25)
         self.Tab2TXTButton.clicked.connect(self.Tab2TXTClick)
         
         self.Tab2CSVButton = QPushButton()
+        self.Tab2CSVButton.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.Tab2CSVButton.setText('CSV')
-        self.Tab2CSVButton.setFixedHeight(20)
+        self.Tab2CSVButton.setFixedHeight(25)
         self.Tab2CSVButton.clicked.connect(self.Tab2CSVClick)
 
         self.Tab2AddButton = QPushButton()
+        self.Tab2AddButton.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.Tab2AddButton.setText('+')
-        self.Tab2AddButton.setFixedHeight(20)
+        self.Tab2AddButton.setFixedHeight(25)
         self.Tab2AddButton.clicked.connect(self.Tab2AddClick)
 
         self.Tab2RemoveButton = QPushButton()
+        self.Tab2RemoveButton.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.Tab2RemoveButton.setText('-')
-        self.Tab2RemoveButton.setFixedHeight(20)
+        self.Tab2RemoveButton.setFixedHeight(25)
         self.Tab2RemoveButton.clicked.connect(self.Tab2RemoveClick)
 
         self.Tab2input1 = QLineEdit()
@@ -759,9 +809,11 @@ class MainWindow(QWidget):
         self.Tab2input1.editingFinished.connect(self.Tab2input1Fin)
 
         self.Tab2input2 = QListWidget()
+        self.Tab2input2.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.Tab2input2.setFixedHeight(128)
 
         self.Tab2analysisButton = QPushButton(Translator.translate('analysis', lang))
+        self.Tab2analysisButton.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.Tab2analysisButton.setFixedHeight(32)
         self.Tab2analysisButton.clicked.connect(self.Tab2ButtonClick)
 
@@ -770,6 +822,7 @@ class MainWindow(QWidget):
         self.Tab2Blank2 = QLabel('\n')
 
         self.Tab2SaveAsCSV = QPushButton('SAVE AS CSV')
+        self.Tab2SaveAsCSV.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.Tab2SaveAsCSV.setFixedHeight(27)
         self.Tab2SaveAsCSV.clicked.connect(self.Tab2SaveCSV)
 
@@ -794,9 +847,11 @@ class MainWindow(QWidget):
     def Tab2SaveCSV(self):
         if (self.Tab2NAME1col == []):
             self.alert = QMessageBox()
+            self.alert.setFont(app.font())
             self.alert.setIcon(QMessageBox.Critical)
+            self.alert.setIconPixmap(QPixmap(errorIcon))
             self.alert.setWindowTitle(Translator.translate('nodata', lang))
-            self.alert.setWindowIcon(QIcon(path.abspath(path.join(path.dirname(__file__), 'icons/NK.png'))))
+            self.alert.setWindowIcon(QIcon(iconfilename))
             self.alert.setText(Translator.translate('nodatamsg', lang))
             self.alert.setStandardButtons(QMessageBox.Retry)
             self.alert.setDefaultButton(QMessageBox.Retry)
@@ -834,6 +889,7 @@ class MainWindow(QWidget):
                     if (len(self.loadTXTList[x]) == 2 or len(self.loadTXTList[x]) == 3):
                         if (len(self.loadTXTtoClear) == 2 or len(self.loadTXTtoClear) == 3):
                             self.Tab2AddItem = QListWidgetItem(self.loadTXTtoClear)
+                            self.Tab2AddItem.setFont(app.font())
                             self.Tab2AddItem.setTextAlignment(Qt.AlignCenter)
                             self.Tab2AddItem.setSizeHint(QSize(0, 25))
                             self.Tab2input2.addItem(self.Tab2AddItem)
@@ -842,8 +898,6 @@ class MainWindow(QWidget):
             # self.QTab2.setLayout(self.Tab2layout)
         except:
             WriteHandledError()
-        
-
 
     def Tab2CSVClick(self):
         self.loadTXT = QFileDialog()
@@ -863,6 +917,7 @@ class MainWindow(QWidget):
                 if (len(self.loadTXTList[x]) == 2 or len(self.loadTXTList[x]) == 3):
                     if (len(self.loadTXTtoClear) == 2 or len(self.loadTXTtoClear) == 3):
                         self.Tab2AddItem = QListWidgetItem(self.loadTXTtoClear)
+                        self.Tab2AddItem.setFont(app.font())
                         self.Tab2AddItem.setTextAlignment(Qt.AlignCenter)
                         self.Tab2AddItem.setSizeHint(QSize(0, 25))
                         self.Tab2input2.addItem(self.Tab2AddItem)
@@ -881,6 +936,7 @@ class MainWindow(QWidget):
             if (len(str(text)) == 2 or len(str(text)) == 3):
                 if (len(self.Tab2name2Add) == 2 or len(self.Tab2name2Add) == 3):
                     self.Tab2AddItem = QListWidgetItem(self.Tab2name2Add)
+                    self.Tab2AddItem.setFont(app.font())
                     self.Tab2AddItem.setTextAlignment(Qt.AlignCenter)
                     self.Tab2AddItem.setSizeHint(QSize(0, 25))
                     self.Tab2input2.addItem(self.Tab2AddItem)
@@ -967,6 +1023,7 @@ class MainWindow(QWidget):
             self.Tab2RESULTcol.append(str(self.Name6List[0]) + str(self.Name6List[1]) + '%')
 
         self.Tab2table = QTableWidget()
+        self.Tab2table.setFont(app.font())
         self.Tab2table.setRowCount(len(Names2))
         self.Tab2table.setColumnCount(3)
 
@@ -990,7 +1047,7 @@ class MainWindow(QWidget):
         # self.QTab2.setLayout(self.Tab2layout)
 
     def Tab3(self):
-        self.Tab3layout = QGridLayout(self)
+        self.Tab3layout = QGridLayout()
         self.Tab3layout.setAlignment(Qt.AlignTop)
 
         self.GroupBox1 = QGroupBox(Translator.translate('name1', lang))
@@ -1004,20 +1061,24 @@ class MainWindow(QWidget):
         self.Vbox2 = QVBoxLayout()
 
         self.Tab3TXTButton1 = QPushButton()
+        self.Tab3TXTButton1.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.Tab3TXTButton1.setText('TXT 1')
-        self.Tab3TXTButton1.setFixedHeight(20)
+        self.Tab3TXTButton1.setFixedHeight(25)
         self.Tab3TXTButton1.clicked.connect(self.Tab3TXTButton1Click)
         self.Tab3CSVButton1 = QPushButton()
+        self.Tab3CSVButton1.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.Tab3CSVButton1.setText('CSV 1')
-        self.Tab3CSVButton1.setFixedHeight(20)
+        self.Tab3CSVButton1.setFixedHeight(25)
         self.Tab3CSVButton1.clicked.connect(self.Tab3CSVButton1Click)
         self.Tab3AddButton1 = QPushButton()
+        self.Tab3AddButton1.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.Tab3AddButton1.setText('+')
-        self.Tab3AddButton1.setFixedHeight(20)
+        self.Tab3AddButton1.setFixedHeight(25)
         self.Tab3AddButton1.clicked.connect(self.Tab3AddButton1Click)
         self.Tab3RemoveButton1 = QPushButton()
+        self.Tab3RemoveButton1.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.Tab3RemoveButton1.setText('-')
-        self.Tab3RemoveButton1.setFixedHeight(20)
+        self.Tab3RemoveButton1.setFixedHeight(25)
         self.Tab3RemoveButton1.clicked.connect(self.Tab3RemoveButton1Click)
         self.Hbox1.addWidget(self.Tab3TXTButton1)
         self.Hbox1.addWidget(self.Tab3CSVButton1)
@@ -1028,20 +1089,24 @@ class MainWindow(QWidget):
         self.Vbox1.addLayout(self.Hbox15)
 
         self.Tab3TXTButton2 = QPushButton()
+        self.Tab3TXTButton2.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.Tab3TXTButton2.setText('TXT 2')
-        self.Tab3TXTButton2.setFixedHeight(20)
+        self.Tab3TXTButton2.setFixedHeight(25)
         self.Tab3TXTButton2.clicked.connect(self.Tab3TXTButton2Click)
         self.Tab3CSVButton2 = QPushButton()
+        self.Tab3CSVButton2.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.Tab3CSVButton2.setText('CSV 2')
-        self.Tab3CSVButton2.setFixedHeight(20)
+        self.Tab3CSVButton2.setFixedHeight(25)
         self.Tab3CSVButton2.clicked.connect(self.Tab3CSVButton2Click)
         self.Tab3AddButton2 = QPushButton()
+        self.Tab3AddButton2.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.Tab3AddButton2.setText('+')
-        self.Tab3AddButton2.setFixedHeight(20)
+        self.Tab3AddButton2.setFixedHeight(25)
         self.Tab3AddButton2.clicked.connect(self.Tab3AddButton2Click)
         self.Tab3RemoveButton2 = QPushButton()
+        self.Tab3RemoveButton2.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.Tab3RemoveButton2.setText('-')
-        self.Tab3RemoveButton2.setFixedHeight(20)
+        self.Tab3RemoveButton2.setFixedHeight(25)
         self.Tab3RemoveButton2.clicked.connect(self.Tab3RemoveButton2Click)
         self.Hbox2.addWidget(self.Tab3TXTButton2)
         self.Hbox2.addWidget(self.Tab3CSVButton2)
@@ -1052,34 +1117,40 @@ class MainWindow(QWidget):
         self.Vbox2.addLayout(self.Hbox25)
 
         self.GroupBox1.setLayout(self.Vbox1)
-        self.GroupBox1.setFixedHeight(220)
+        self.GroupBox1.setFixedHeight(230)
         self.GroupBox1.setAlignment(Qt.AlignCenter)
         self.GroupBox2.setLayout(self.Vbox2)
-        self.GroupBox2.setFixedHeight(220)
+        self.GroupBox2.setFixedHeight(230)
         self.GroupBox2.setAlignment(Qt.AlignCenter)
 
         self.Tab3input1 = QListWidget()
+        self.Tab3input1.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.Tab3input1.setFixedHeight(128)
         self.Tab3input2 = QListWidget()
+        self.Tab3input2.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.Tab3input2.setFixedHeight(128)
 
         self.Vbox1.addWidget(self.Tab3input1)
         self.Vbox2.addWidget(self.Tab3input2)
 
         self.Tab3DuplicateCheckBox = QPushButton(Translator.translate('duplicate', lang))
+        self.Tab3DuplicateCheckBox.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.Tab3DuplicateCheckBox.setStyleSheet('font-size: 11px')
-        self.Tab3DuplicateCheckBox.setFixedHeight(32)
+        self.Tab3DuplicateCheckBox.setFixedHeight(37)
         self.Tab3DuplicateCheckBox.clicked.connect(self.Duplicate)
 
         self.Tab3analysisButton = QPushButton(Translator.translate('analysistaketime', lang))
-        self.Tab3analysisButton.setFixedHeight(32)
+        self.Tab3analysisButton.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.Tab3analysisButton.setFixedHeight(37)
         self.Tab3analysisButton.clicked.connect(self.Tab3ButtonClick)
 
         self.Tab3Blank1 = QLabel('\n')
         self.Tab3table = QTableWidget()
+        self.Tab3table.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.Tab3Blank2 = QLabel('\n')
 
         self.Tab3SaveAsCSV = QPushButton('SAVE AS CSV')
+        self.Tab3SaveAsCSV.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.Tab3SaveAsCSV.setFixedHeight(27)
         self.Tab3SaveAsCSV.clicked.connect(self.Tab3SaveCSV)
 
@@ -1097,9 +1168,11 @@ class MainWindow(QWidget):
     def Tab3SaveCSV(self):
         if (self.Tab3NAME1col == [] or self.Tab3NAME2col == []):
             self.alert = QMessageBox()
+            self.alert.setFont(app.font())
             self.alert.setIcon(QMessageBox.Critical)
+            self.alert.setIconPixmap(QPixmap(errorIcon))
             self.alert.setWindowTitle(Translator.translate('nodata', lang))
-            self.alert.setWindowIcon(QIcon(path.abspath(path.join(path.dirname(__file__), 'icons/NK.png'))))
+            self.alert.setWindowIcon(QIcon(iconfilename))
             self.alert.setText(Translator.translate('nodatamsg', lang))
             self.alert.setStandardButtons(QMessageBox.Retry)
             self.alert.setDefaultButton(QMessageBox.Retry)
@@ -1125,6 +1198,7 @@ class MainWindow(QWidget):
         self.Tab3input2.clear()
         for i in range(self.Tab3input1.count()):
             self.Tab3AddItem = QListWidgetItem(self.Tab3input1.item(i))
+            self.Tab3AddItem.setFont(app.font())
             self.Tab3AddItem.setTextAlignment(Qt.AlignCenter)
             self.Tab3AddItem.setSizeHint(QSize(0, 25))
             self.Tab3input2.addItem(self.Tab3AddItem)
@@ -1148,6 +1222,7 @@ class MainWindow(QWidget):
                     if (len(self.loadTXTList[x]) == 2 or len(self.loadTXTList[x]) == 3):
                         if (len(self.loadTXTtoClear) == 2 or len(self.loadTXTtoClear) == 3):
                             self.Tab3AddItem = QListWidgetItem(self.loadTXTtoClear)
+                            self.Tab3AddItem.setFont(app.font())
                             self.Tab3AddItem.setTextAlignment(Qt.AlignCenter)
                             self.Tab3AddItem.setSizeHint(QSize(0, 25))
                             self.Tab3input1.addItem(self.Tab3AddItem)
@@ -1175,6 +1250,7 @@ class MainWindow(QWidget):
                 if (len(self.loadCSVList[x]) == 2 or len(self.loadCSVList[x]) == 3):
                     if (len(self.loadCSVtoClear) == 2 or len(self.loadCSVtoClear) == 3):
                         self.Tab3AddItem = QListWidgetItem(self.loadCSVtoClear)
+                        self.Tab3AddItem.setFont(app.font())
                         self.Tab3AddItem.setTextAlignment(Qt.AlignCenter)
                         self.Tab3AddItem.setSizeHint(QSize(0, 25))
                         self.Tab3input1.addItem(self.Tab3AddItem)
@@ -1200,6 +1276,7 @@ class MainWindow(QWidget):
                     if (len(self.loadTXTList[x]) == 2 or len(self.loadTXTList[x]) == 3):
                         if (len(self.loadTXTtoClear) == 2 or len(self.loadTXTtoClear) == 3):
                             self.Tab3AddItem = QListWidgetItem(self.loadTXTtoClear)
+                            self.Tab3AddItem.setFont(app.font())
                             self.Tab3AddItem.setTextAlignment(Qt.AlignCenter)
                             self.Tab3AddItem.setSizeHint(QSize(0, 25))
                             self.Tab3input2.addItem(self.Tab3AddItem)
@@ -1227,6 +1304,7 @@ class MainWindow(QWidget):
                 if (len(self.loadCSVList[x]) == 2 or len(self.loadCSVList[x]) == 3):
                     if (len(self.loadCSVtoClear) == 2 or len(self.loadCSVtoClear) == 3):
                         self.Tab3AddItem = QListWidgetItem(self.loadCSVtoClear)
+                        self.Tab3AddItem.setFont(app.font())
                         self.Tab3AddItem.setTextAlignment(Qt.AlignCenter)
                         self.Tab3AddItem.setSizeHint(QSize(0, 25))
                         self.Tab3input2.addItem(self.Tab3AddItem)
@@ -1244,6 +1322,7 @@ class MainWindow(QWidget):
             if (len(str(text)) == 2 or len(str(text)) == 3):
                 if (len(self.Tab3name1Add) == 2 or len(self.Tab3name1Add) == 3):
                     self.Tab3AddItem = QListWidgetItem(self.Tab3name1Add)
+                    self.Tab3AddItem.setFont(app.font())
                     self.Tab3AddItem.setTextAlignment(Qt.AlignCenter)
                     self.Tab3AddItem.setSizeHint(QSize(0, 25))
                     self.Tab3input1.addItem(self.Tab3AddItem)
@@ -1267,6 +1346,7 @@ class MainWindow(QWidget):
             if (len(str(text)) == 2 or len(str(text)) == 3):
                 if (len(self.Tab3name1Add) == 2 or len(self.Tab3name1Add) == 3):
                     self.Tab3AddItem = QListWidgetItem(self.Tab3name1Add)
+                    self.Tab3AddItem.setFont(app.font())
                     self.Tab3AddItem.setTextAlignment(Qt.AlignCenter)
                     self.Tab3AddItem.setSizeHint(QSize(0, 25))
                     self.Tab3input2.addItem(self.Tab3AddItem)
@@ -1359,6 +1439,7 @@ class MainWindow(QWidget):
                 self.Tab3RESULTcol.append(str(self.Name6List[0]) + str(self.Name6List[1]) + '%')
 
         self.Tab3table = QTableWidget()
+        self.Tab3table.setFont(app.font())
         self.Tab3table.setRowCount(len(Names1) * len(Names2))
         self.Tab3table.setColumnCount(3)
 
@@ -1378,6 +1459,18 @@ class MainWindow(QWidget):
 
         self.Tab3layout.addWidget(self.Tab3table, 3, 0, 1, 4)
 
+def customize():
+    # 테마 설정
+    StyleFile = QFile(path.abspath(path.join(path.dirname(__file__), 'Style.css')))
+    StyleFile.open(QFile.ReadOnly | QFile.Text)
+    stream = QTextStream(StyleFile)
+    app.setStyleSheet(stream.readAll())
+
+    # 윈도우 뒤쪽 색 설정
+    palatte = window.palette()
+    palatte.setColor(window.backgroundRole(), QColor('#dbd9ff'))
+    window.setPalette(palatte)
+
 
 if __name__ == '__main__':
     import sys
@@ -1392,16 +1485,7 @@ if __name__ == '__main__':
 
     window = MainWindow()
 
-    # 테마 설정
-    # StyleFile = QFile(path.abspath(path.join(path.dirname(__file__), 'styles/MyStyle.css')))
-    # StyleFile.open(QFile.ReadOnly | QFile.Text)
-    # stream = QTextStream(StyleFile)
-    # app.setStyleSheet(stream.readAll())
-
-    # 윈도우 뒤쪽 색 설정
-    # palatte = window.palette()
-    # palatte.setColor(window.backgroundRole(), Qt.white)
-    # window.setPalette(palatte)
+    customize()
 
     window.show()
     sys.exit(app.exec())
