@@ -1140,7 +1140,7 @@ class MainWindow(QWidget):
 
         self.Tab3DuplicateLtoRBox = QPushButton(Translator.translate('duplicateLtoR', lang))
         self.Tab3DuplicateLtoRBox.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.Tab3DuplicateLtoRBox.setStyleSheet('font-size: 11px')
+        self.Tab3DuplicateLtoRBox.setStyleSheet('font-size: 10px')
         self.Tab3DuplicateLtoRBox.setFixedHeight(37)
         self.Tab3DuplicateLtoRBox.clicked.connect(self.DuplicateLtoR)
 
@@ -1151,7 +1151,7 @@ class MainWindow(QWidget):
 
         self.Tab3DuplicateRtoLBox = QPushButton(Translator.translate('duplicateRtoL', lang))
         self.Tab3DuplicateRtoLBox.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.Tab3DuplicateRtoLBox.setStyleSheet('font-size: 11px')
+        self.Tab3DuplicateRtoLBox.setStyleSheet('font-size: 10px')
         self.Tab3DuplicateRtoLBox.setFixedHeight(37)
         self.Tab3DuplicateRtoLBox.clicked.connect(self.DuplicateRtoL)
 
