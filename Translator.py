@@ -44,13 +44,15 @@ dic = [
     ['analysis','Analysis','조회하기'],
     ['nodata','No Data Exists','데이터가 존재하지 않음'],
     ['nodatamsg','No Data Exists.\nPlease Analysis First.','데이터가 존재하지 않습니다. 먼저 조회해 주세요.'],
-    ['duplicate','Duplicate\nLeft list to Right list','좌측 항목을\n우측으로 복제'],
-    ['analysistaketime','Analysis (It will take some time)','조회하기 (시간이 걸릴 수 있습니다)'],
+    ['duplicateLtoR','Duplicate\nLeft list to Right list','좌측 항목을\n우측으로 복제'],
+    ['duplicateRtoL','Duplicate\nRight list to Left list','우측 항목을\n좌측으로 복제'],
+    ['analysistaketime','Analysis (It May Not Respond Temporarily)','조회하기 (일시적으로 응답하지 않을 수 있습니다)'],
     ['adddialog','Add Dialog','항목 입력'],
     ['entertext','Enter text :','텍스트를 입력하세요 :'],
     ['langsetting','Language Setting','언어 설정'],
     ['langsetnotice','You Need to Restart Program to Update Language.','프로그램을 재시작해야 언어가 변경됩니다.'],
     ['information','Information','정보'],
+    ['resetlist','Clear List','리스트 초기화하기'],
 ]
 
 def translate(tag, lang):
@@ -64,6 +66,7 @@ def translate(tag, lang):
 
         for data in dic:
             if data[0] == tag:
+                # print('[Translator] Translated {} -> {}'.format(tag, data[langaugeNumber]))
                 return data[langaugeNumber]
     except:
         WriteHandledError()

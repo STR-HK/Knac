@@ -20,6 +20,8 @@ def jamo(args):
         r_lst.append(CHOSUNG_LIST[ch1])
         r_lst.append(JUNGSUNG_LIST[ch2])
         r_lst.append(JONGSUNG_LIST[ch3])
+
+    # print('[Hangul] Splited Jamo')
     
     return r_lst
 
@@ -42,6 +44,8 @@ def gyeopjamo(args):
             returns.append(args[s])
         if args[s] in data:
             returns.append(data[args[s]])
+
+    # print('[Hangul] Splited GyeopJamo')
 
     return returns
 
@@ -66,5 +70,7 @@ def convertonumber(args, order):
 
     for v in range(len(args)):
         returns += data[args[v]]
+
+    # print('[Hangul] Converted to Number')
         
     return returns

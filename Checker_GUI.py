@@ -1,15 +1,8 @@
+from sys import argv
 from PyQt5 import QtGui
-from PyQt5.QtCore import QDateTime, Qt, QTimer, QSize, QTextStream, QFile, reset
-from PyQt5.QtWidgets import (QApplication, QCheckBox, QComboBox, QDateTimeEdit,
-        QDial, QDialog, QGridLayout, QGroupBox, QHBoxLayout, QLabel, QLineEdit,
-        QProgressBar, QPushButton, QRadioButton, QScrollBar, QSizePolicy,
-        QSlider, QSpinBox, QStyleFactory, QTableWidget, QTabWidget, QTextEdit,
-        QVBoxLayout, QWidget, QMessageBox, QStackedWidget, QStatusBar, QDesktopWidget,
-        QMainWindow, QMenuBar, QAction, QMenu, QListWidget, QListWidgetItem, QInputDialog, QToolBar, 
-        QFileDialog, QTableWidgetItem, QHeaderView, QShortcut)
-
-from PyQt5.QtGui import (QIcon, QColor, QPainter, QFontDatabase, QFont,
-        QPixmap, QCursor, QKeySequence)
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
 
 from PyQt5 import QtCore
 
@@ -23,9 +16,16 @@ import re
 import csv
 import time
 
+import math
+
 import DataManager
+# print('Successfully Imported DataManager')
+
 import Translator
+# print('Successfully Imported Translator')
+
 import Hangul
+# print('Successfully Imported Hangul')
 
 try:
     lang = DataManager.ReadData()['lang']
@@ -106,7 +106,6 @@ class MainWindow(QWidget):
         self.setLayout(self.layout)
 
         self.ShortCut()
-
 
         # 일단 사용하지 않음
         # self.Dev()
@@ -614,7 +613,6 @@ class MainWindow(QWidget):
         self.Tab1input1.setPlaceholderText(Translator.translate('name1', lang))
         self.Tab1input1.setFixedHeight(35)
         self.Tab1input1.editingFinished.connect(self.Tab1input1Fin)
-        self.Tab1input1.selectionChanged.connect(self.OutFocus)
 
         self.Tab1input2 = QLineEdit()
         self.Tab1input2.setAlignment(QtCore.Qt.AlignCenter)
@@ -641,9 +639,6 @@ class MainWindow(QWidget):
 
         # 최종 반영
         self.QTab1.setLayout(self.Tab1layout)
-
-    def OutFocus(self):
-        print('out')
 
     def Tab1input1Fin(self):
         self.Tab1input2.setFocus()
@@ -778,27 +773,23 @@ class MainWindow(QWidget):
         self.Tab2layout = QGridLayout()
         self.Tab2layout.setAlignment(Qt.AlignTop)
 
-        self.Tab2TXTButton = QPushButton()
+        self.Tab2TXTButton = QPushButton('TXT')
         self.Tab2TXTButton.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.Tab2TXTButton.setText('TXT')
         self.Tab2TXTButton.setFixedHeight(25)
         self.Tab2TXTButton.clicked.connect(self.Tab2TXTClick)
         
-        self.Tab2CSVButton = QPushButton()
+        self.Tab2CSVButton = QPushButton('CSV')
         self.Tab2CSVButton.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.Tab2CSVButton.setText('CSV')
         self.Tab2CSVButton.setFixedHeight(25)
         self.Tab2CSVButton.clicked.connect(self.Tab2CSVClick)
 
-        self.Tab2AddButton = QPushButton()
+        self.Tab2AddButton = QPushButton('+')
         self.Tab2AddButton.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.Tab2AddButton.setText('+')
         self.Tab2AddButton.setFixedHeight(25)
         self.Tab2AddButton.clicked.connect(self.Tab2AddClick)
 
-        self.Tab2RemoveButton = QPushButton()
+        self.Tab2RemoveButton = QPushButton('-')
         self.Tab2RemoveButton.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.Tab2RemoveButton.setText('-')
         self.Tab2RemoveButton.setFixedHeight(25)
         self.Tab2RemoveButton.clicked.connect(self.Tab2RemoveClick)
 
@@ -817,6 +808,11 @@ class MainWindow(QWidget):
         self.Tab2analysisButton.setFixedHeight(32)
         self.Tab2analysisButton.clicked.connect(self.Tab2ButtonClick)
 
+        self.Tab2ClearAll = QPushButton(Translator.translate('resetlist', lang))
+        self.Tab2ClearAll.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.Tab2ClearAll.setFixedHeight(32)
+        self.Tab2ClearAll.clicked.connect(self.Tab2ClearAllFunc)
+
         self.Tab2Blank1 = QLabel('\n')
         self.Tab2table = QTableWidget()
         self.Tab2Blank2 = QLabel('\n')
@@ -833,13 +829,17 @@ class MainWindow(QWidget):
 
         self.Tab2layout.addWidget(self.Tab2input1, 1, 0, 1, 2)
         self.Tab2layout.addWidget(self.Tab2input2, 1, 2, 1, 2)
-        self.Tab2layout.addWidget(self.Tab2analysisButton, 2, 0, 1, 4)
+        self.Tab2layout.addWidget(self.Tab2analysisButton, 2, 0, 1, 3)
+        self.Tab2layout.addWidget(self.Tab2ClearAll, 2, 3, 1, 1)
         self.Tab2layout.addWidget(self.Tab2Blank1, 3, 0, 1, 4)
         self.Tab2layout.addWidget(self.Tab2table, 4, 0, 1, 4)
         self.Tab2layout.addWidget(self.Tab2SaveAsCSV, 5, 0, 1, 4)
 
         # 최종 반영
         self.QTab2.setLayout(self.Tab2layout)
+
+    def Tab2ClearAllFunc(self):
+        self.Tab2input2.clear()
 
     def Tab2input1Fin(self):
         self.Tab2AddButton.setFocus()
@@ -1060,24 +1060,20 @@ class MainWindow(QWidget):
         self.Vbox1 = QVBoxLayout()
         self.Vbox2 = QVBoxLayout()
 
-        self.Tab3TXTButton1 = QPushButton()
+        self.Tab3TXTButton1 = QPushButton('TXT 1')
         self.Tab3TXTButton1.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.Tab3TXTButton1.setText('TXT 1')
         self.Tab3TXTButton1.setFixedHeight(25)
         self.Tab3TXTButton1.clicked.connect(self.Tab3TXTButton1Click)
-        self.Tab3CSVButton1 = QPushButton()
+        self.Tab3CSVButton1 = QPushButton('CSV 1')
         self.Tab3CSVButton1.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.Tab3CSVButton1.setText('CSV 1')
         self.Tab3CSVButton1.setFixedHeight(25)
         self.Tab3CSVButton1.clicked.connect(self.Tab3CSVButton1Click)
-        self.Tab3AddButton1 = QPushButton()
+        self.Tab3AddButton1 = QPushButton('+')
         self.Tab3AddButton1.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.Tab3AddButton1.setText('+')
         self.Tab3AddButton1.setFixedHeight(25)
         self.Tab3AddButton1.clicked.connect(self.Tab3AddButton1Click)
-        self.Tab3RemoveButton1 = QPushButton()
+        self.Tab3RemoveButton1 = QPushButton('-')
         self.Tab3RemoveButton1.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.Tab3RemoveButton1.setText('-')
         self.Tab3RemoveButton1.setFixedHeight(25)
         self.Tab3RemoveButton1.clicked.connect(self.Tab3RemoveButton1Click)
         self.Hbox1.addWidget(self.Tab3TXTButton1)
@@ -1088,24 +1084,20 @@ class MainWindow(QWidget):
         self.Vbox1.addLayout(self.Hbox1)
         self.Vbox1.addLayout(self.Hbox15)
 
-        self.Tab3TXTButton2 = QPushButton()
+        self.Tab3TXTButton2 = QPushButton('TXT 2')
         self.Tab3TXTButton2.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.Tab3TXTButton2.setText('TXT 2')
         self.Tab3TXTButton2.setFixedHeight(25)
         self.Tab3TXTButton2.clicked.connect(self.Tab3TXTButton2Click)
-        self.Tab3CSVButton2 = QPushButton()
+        self.Tab3CSVButton2 = QPushButton('CSV 2')
         self.Tab3CSVButton2.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.Tab3CSVButton2.setText('CSV 2')
         self.Tab3CSVButton2.setFixedHeight(25)
         self.Tab3CSVButton2.clicked.connect(self.Tab3CSVButton2Click)
-        self.Tab3AddButton2 = QPushButton()
+        self.Tab3AddButton2 = QPushButton('+')
         self.Tab3AddButton2.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.Tab3AddButton2.setText('+')
         self.Tab3AddButton2.setFixedHeight(25)
         self.Tab3AddButton2.clicked.connect(self.Tab3AddButton2Click)
-        self.Tab3RemoveButton2 = QPushButton()
+        self.Tab3RemoveButton2 = QPushButton('-')
         self.Tab3RemoveButton2.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.Tab3RemoveButton2.setText('-')
         self.Tab3RemoveButton2.setFixedHeight(25)
         self.Tab3RemoveButton2.clicked.connect(self.Tab3RemoveButton2Click)
         self.Hbox2.addWidget(self.Tab3TXTButton2)
@@ -1117,10 +1109,10 @@ class MainWindow(QWidget):
         self.Vbox2.addLayout(self.Hbox25)
 
         self.GroupBox1.setLayout(self.Vbox1)
-        self.GroupBox1.setFixedHeight(230)
+        self.GroupBox1.setFixedHeight(260)
         self.GroupBox1.setAlignment(Qt.AlignCenter)
         self.GroupBox2.setLayout(self.Vbox2)
-        self.GroupBox2.setFixedHeight(230)
+        self.GroupBox2.setFixedHeight(260)
         self.GroupBox2.setAlignment(Qt.AlignCenter)
 
         self.Tab3input1 = QListWidget()
@@ -1133,21 +1125,43 @@ class MainWindow(QWidget):
         self.Vbox1.addWidget(self.Tab3input1)
         self.Vbox2.addWidget(self.Tab3input2)
 
-        self.Tab3DuplicateCheckBox = QPushButton(Translator.translate('duplicate', lang))
-        self.Tab3DuplicateCheckBox.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.Tab3DuplicateCheckBox.setStyleSheet('font-size: 11px')
-        self.Tab3DuplicateCheckBox.setFixedHeight(37)
-        self.Tab3DuplicateCheckBox.clicked.connect(self.Duplicate)
+        self.Tab3input1ClearAll = QPushButton(Translator.translate('resetlist', lang))
+        self.Tab3input1ClearAll.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.Tab3input1ClearAll.setFixedHeight(27)
+        self.Tab3input1ClearAll.clicked.connect(self.Tab3input1ClearAllFunc)
+
+        self.Tab3input2ClearAll = QPushButton(Translator.translate('resetlist', lang))
+        self.Tab3input2ClearAll.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.Tab3input2ClearAll.setFixedHeight(27)
+        self.Tab3input2ClearAll.clicked.connect(self.Tab3input2ClearAllFunc)
+
+        self.Vbox1.addWidget(self.Tab3input1ClearAll)
+        self.Vbox2.addWidget(self.Tab3input2ClearAll)
+
+        self.Tab3DuplicateLtoRBox = QPushButton(Translator.translate('duplicateLtoR', lang))
+        self.Tab3DuplicateLtoRBox.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.Tab3DuplicateLtoRBox.setStyleSheet('font-size: 11px')
+        self.Tab3DuplicateLtoRBox.setFixedHeight(37)
+        self.Tab3DuplicateLtoRBox.clicked.connect(self.DuplicateLtoR)
 
         self.Tab3analysisButton = QPushButton(Translator.translate('analysistaketime', lang))
         self.Tab3analysisButton.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.Tab3analysisButton.setFixedHeight(37)
         self.Tab3analysisButton.clicked.connect(self.Tab3ButtonClick)
 
+        self.Tab3DuplicateRtoLBox = QPushButton(Translator.translate('duplicateRtoL', lang))
+        self.Tab3DuplicateRtoLBox.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.Tab3DuplicateRtoLBox.setStyleSheet('font-size: 11px')
+        self.Tab3DuplicateRtoLBox.setFixedHeight(37)
+        self.Tab3DuplicateRtoLBox.clicked.connect(self.DuplicateRtoL)
+
         self.Tab3Blank1 = QLabel('\n')
         self.Tab3table = QTableWidget()
         self.Tab3table.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.Tab3Blank2 = QLabel('\n')
+
+        self.Tab3ProgressBar = QProgressBar()
+        self.Tab3ProgressBar.setValue(0)
 
         self.Tab3SaveAsCSV = QPushButton('SAVE AS CSV')
         self.Tab3SaveAsCSV.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
@@ -1156,14 +1170,21 @@ class MainWindow(QWidget):
 
         self.Tab3layout.addWidget(self.GroupBox1, 0, 0, 1, 2)
         self.Tab3layout.addWidget(self.GroupBox2, 0, 2, 1, 2)
-        self.Tab3layout.addWidget(self.Tab3DuplicateCheckBox, 1, 3, 1, 1)
-        self.Tab3layout.addWidget(self.Tab3analysisButton, 1, 0, 1, 3)
-        self.Tab3layout.addWidget(self.Tab3Blank1, 2, 0, 1, 4)
+        self.Tab3layout.addWidget(self.Tab3DuplicateLtoRBox, 1, 0, 1, 1)
+        self.Tab3layout.addWidget(self.Tab3analysisButton, 1, 1, 1, 2)
+        self.Tab3layout.addWidget(self.Tab3DuplicateRtoLBox, 1, 3, 1, 1)
+        self.Tab3layout.addWidget(self.Tab3ProgressBar, 2, 0, 1, 4)
         self.Tab3layout.addWidget(self.Tab3table, 3, 0, 1, 4)
         self.Tab3layout.addWidget(self.Tab3SaveAsCSV, 4, 0, 1, 4)
 
         # 최종 반영
         self.QTab3.setLayout(self.Tab3layout)
+
+    def Tab3input1ClearAllFunc(self):
+        self.Tab3input1.clear()
+
+    def Tab3input2ClearAllFunc(self):
+        self.Tab3input2.clear()
 
     def Tab3SaveCSV(self):
         if (self.Tab3NAME1col == [] or self.Tab3NAME2col == []):
@@ -1194,7 +1215,7 @@ class MainWindow(QWidget):
             # for f in range(len(self.Tab2NAME1col)):
             #     csv_writer.writerow([self.Tab2NAME1col[f].replace('○',''), self.Tab2NAME2col[f].replace('○',''), self.Tab2RESULTcol[f]])
 
-    def Duplicate(self):
+    def DuplicateLtoR(self):
         self.Tab3input2.clear()
         for i in range(self.Tab3input1.count()):
             self.Tab3AddItem = QListWidgetItem(self.Tab3input1.item(i))
@@ -1202,6 +1223,15 @@ class MainWindow(QWidget):
             self.Tab3AddItem.setTextAlignment(Qt.AlignCenter)
             self.Tab3AddItem.setSizeHint(QSize(0, 25))
             self.Tab3input2.addItem(self.Tab3AddItem)
+
+    def DuplicateRtoL(self):
+        self.Tab3input1.clear()
+        for i in range(self.Tab3input2.count()):
+            self.Tab3AddItem = QListWidgetItem(self.Tab3input2.item(i))
+            self.Tab3AddItem.setFont(app.font())
+            self.Tab3AddItem.setTextAlignment(Qt.AlignCenter)
+            self.Tab3AddItem.setSizeHint(QSize(0, 25))
+            self.Tab3input1.addItem(self.Tab3AddItem)
 
     def Tab3TXTButton1Click(self):
         try:
@@ -1372,6 +1402,7 @@ class MainWindow(QWidget):
         self.inValidMsg()
 
     def Tab3Analyser(self, Names1, Names2):
+        self.Tab3ProgressBar.setValue(0)
         self.Tab3NAME1col = []
         self.Tab3NAME2col = []
         self.Tab3RESULTcol = []
@@ -1398,6 +1429,80 @@ class MainWindow(QWidget):
         self.Tab3NAME1Count = len(Names1)
         self.Tab3NAME2Count = len(Names2)
 
+        PushOut(Names1, Names2, self.strokeOrder)
+
+        # self.start = time.time()
+
+        self.Tab3Thread = Thread1(self)
+        self.Tab3Thread.Col1.connect(self.Tab3NAME1col_def)
+        self.Tab3Thread.Col2.connect(self.Tab3NAME2col_def)
+        self.Tab3Thread.Col3.connect(self.Tab3RESULTcol_def)
+        self.Tab3Thread.Progress.connect(self.Tab3ProgressBar_def)
+        self.Tab3Thread.Finish.connect(self.Tab3ThreadingFinish)
+        self.Tab3Thread.start()
+
+    @pyqtSlot(str)
+    def Tab3NAME1col_def(self, kargs):
+        self.Tab3NAME1col.append(kargs)      
+
+    @pyqtSlot(str)
+    def Tab3NAME2col_def(self, kargs):
+        self.Tab3NAME2col.append(kargs)
+
+    @pyqtSlot(str)
+    def Tab3RESULTcol_def(self, kargs):
+        self.Tab3RESULTcol.append(kargs)
+
+    @pyqtSlot(int)
+    def Tab3ProgressBar_def(self, kargs):
+        self.Tab3ProgressBar.setValue(kargs)
+
+    def Tab3ThreadingFinish(self):
+        self.Tab3table = QTableWidget()
+        self.Tab3table.setFont(app.font())
+        self.Tab3table.setRowCount(len(Names1) * len(Names2))
+        self.Tab3table.setColumnCount(3)
+
+        self.Tab3table.setColumnWidth(0, 145)
+        self.Tab3table.setColumnWidth(1, 145)
+        self.Tab3table.setColumnWidth(2, 145)
+
+        self.header = self.Tab3table.horizontalHeader()       
+        self.header.setSectionResizeMode(0, QHeaderView.Stretch)
+        self.header.setSectionResizeMode(1, QHeaderView.Stretch)
+        self.header.setSectionResizeMode(2, QHeaderView.Stretch)
+
+        for q in range(len(Names1) * len(Names2)):
+            self.Tab3table.setItem(q, 0, QTableWidgetItem(self.Tab3NAME1col[q].replace('○','')))
+            self.Tab3table.setItem(q, 1, QTableWidgetItem(self.Tab3NAME2col[q].replace('○','')))
+            self.Tab3table.setItem(q, 2, QTableWidgetItem(self.Tab3RESULTcol[q]))
+
+        self.Tab3ProgressBar.setValue(100)
+        self.Tab3layout.addWidget(self.Tab3table, 3, 0, 1, 4)
+
+        self.Tab3Thread.terminate()
+        
+        # print("time :", time.time() - self.start)
+
+def PushOut(Arg1, Arg2, STK):
+    global Names1
+    global Names2
+    global strokeOrder
+    Names1 = Arg1
+    Names2 = Arg2
+    strokeOrder = STK
+
+class Thread1(QThread):
+    Col1 = pyqtSignal(str)
+    Col2 = pyqtSignal(str)
+    Col3 = pyqtSignal(str)
+    Progress = pyqtSignal(int)
+    Finish = pyqtSignal()
+
+    def __init__(self, parent):
+        super().__init__(parent)
+
+    def run(self):
         for o in range(len(Names1)):
             for p in range(len(Names2)):
 
@@ -1407,11 +1512,11 @@ class MainWindow(QWidget):
                 for a in range(3):
                     self.Name1toList.append(Names1[o][a])
                     self.Name1toList[a] = Hangul.gyeopjamo(Hangul.jamo(self.Name1toList[a]))
-                    self.Name1toList[a] = Hangul.convertonumber(''.join(self.Name1toList[a]), self.strokeOrder)
+                    self.Name1toList[a] = Hangul.convertonumber(''.join(self.Name1toList[a]), strokeOrder)
                 for b in range(3):
                     self.Name2toList.append(Names2[p][b])
                     self.Name2toList[b] = Hangul.gyeopjamo(Hangul.jamo(self.Name2toList[b]))
-                    self.Name2toList[b] = Hangul.convertonumber(''.join(self.Name2toList[b]), self.strokeOrder)
+                    self.Name2toList[b] = Hangul.convertonumber(''.join(self.Name2toList[b]), strokeOrder)
                 
                 self.Name1and2 = []
                 for w in range(3):
@@ -1434,30 +1539,13 @@ class MainWindow(QWidget):
                 for k in range(2):
                     self.Name6List.append(int(str((self.Name5List[k] + self.Name5List[k+1]))[-1]))
 
-                self.Tab3NAME1col.append(Names1[o].replace('○',''))
-                self.Tab3NAME2col.append(Names2[p].replace('○',''))
-                self.Tab3RESULTcol.append(str(self.Name6List[0]) + str(self.Name6List[1]) + '%')
+                self.Col1.emit(str(Names1[o].replace('○','')))
+                self.Col2.emit(str(Names2[p].replace('○','')))
+                self.Col3.emit(str(self.Name6List[0]) + str(self.Name6List[1]) + '%')
 
-        self.Tab3table = QTableWidget()
-        self.Tab3table.setFont(app.font())
-        self.Tab3table.setRowCount(len(Names1) * len(Names2))
-        self.Tab3table.setColumnCount(3)
+                self.Progress.emit( math.floor((o / len(Names1)) * 100) )
 
-        self.Tab3table.setColumnWidth(0, 145)
-        self.Tab3table.setColumnWidth(1, 145)
-        self.Tab3table.setColumnWidth(2, 145)
-
-        self.header = self.Tab3table.horizontalHeader()       
-        self.header.setSectionResizeMode(0, QHeaderView.Stretch)
-        self.header.setSectionResizeMode(1, QHeaderView.Stretch)
-        self.header.setSectionResizeMode(2, QHeaderView.Stretch)
-
-        for q in range(len(Names1) * len(Names2)):
-            self.Tab3table.setItem(q, 0, QTableWidgetItem(self.Tab3NAME1col[q].replace('○','')))
-            self.Tab3table.setItem(q, 1, QTableWidgetItem(self.Tab3NAME2col[q].replace('○','')))
-            self.Tab3table.setItem(q, 2, QTableWidgetItem(self.Tab3RESULTcol[q]))
-
-        self.Tab3layout.addWidget(self.Tab3table, 3, 0, 1, 4)
+        self.Finish.emit()
 
 def customize():
     # 테마 설정
@@ -1470,7 +1558,6 @@ def customize():
     palatte = window.palette()
     palatte.setColor(window.backgroundRole(), QColor('#dbd9ff'))
     window.setPalette(palatte)
-
 
 if __name__ == '__main__':
     import sys
