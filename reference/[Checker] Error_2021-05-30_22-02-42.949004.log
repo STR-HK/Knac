@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "c:\Users\STR.HK\3D Objects\¿Ã∏ß ±√«’ GUI\Translator.py", line 72, in translate
+    return dic[indexing.index(tag)][langaugeNumber]
+ValueError: 'No Data' is not in list

@@ -1,6 +1,6 @@
 QPushButton {
     /* background-color: white; */
-    border-radius: 3px;
+    border-radius: 2px;
     /* border: 2px solid #A19BFE; */
     /* border: none; */
     padding: 5px;
@@ -17,7 +17,7 @@ QPushButton:hover {
 }
 
 QPushButton:pressed {
-    background-color: #827aff;
+    /* background-color: #827aff; */
 }
 
 QLineEdit {
@@ -28,6 +28,9 @@ QLineEdit {
     border-top-left-radius: 3px;
     border-top-right-radius: 3px;
     border-bottom-color: #A19BFE;
+
+    selection-background-color: #A19BFE;
+    selection-color: black;
 }
 
 QLineEdit:hover {
@@ -82,7 +85,7 @@ QComboBox {
 }
 
 QComboBox QAbstractItemView {
-    selection-background-color: #bebaff;
+    selection-background-color: #bebafb;
     selection-color: black;
     color: black;
     background-color: white;
@@ -116,7 +119,7 @@ QTableWidget {
     outline: none;
 
     border: 2px solid #A19BFE;
-    border-radius: 3px;
+    border-radius: 2px;
 }
 
 QHeaderView {
@@ -154,10 +157,6 @@ QScrollBar::handle:vertical {
     border-radius: 3px;
     min-height: 30px;
     margin: 0px 2px 0px 2px;
-}
-
-QScrollBar:vertic:pressed {
-    background: #e4e4e4;
 }
 
 QScrollBar::add-line:vertical {

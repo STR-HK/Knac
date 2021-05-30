@@ -24,7 +24,7 @@ def WriteHandledError():
 
 dic = [
     ['error','Error Occurred','에러 발생'],
-    ['errorlogged','Error is logged in File:\n{}','에러가 다음 파일에 수집되었습니다 :\n{}'],
+    ['errorlogged','Error is logged in File :\n{}','에러가 다음 파일에 수집되었습니다 :\n{}'],
     ['tab1','𝟏 by 𝟏','𝟏 대 𝟏'],
     ['tab2','𝟏 by 𝒏','𝟏 대 𝒏'],
     ['tab3','𝒏 by 𝒏','𝒏 대 𝒏'],
@@ -36,8 +36,7 @@ dic = [
     ['calculateway','Calculate Way Settings','계산 방법 설정'],
     ['bylineorder','By Line Number', '선의 개수로'],
     ['bystrokeorder','By Stroke Order','획의 순서대로'],
-    ['settingfile','This File is Setting File of Knac DON\'T Remove.','이 파일은 Knac의 설정 파일입니다 삭제시 설정이 삭제되오니 삭제하지 마십시오.'],
-    ['invalidinput','Invalid Input','잘못된 입력'],
+    ['invalid','Invalid Input Value','잘못된 입력값'],
     ['invalidmsg','Invalid Input. Please Retry.\nCondition : KR 2 or 3 Letter','잘못된 입력입니다. 다시 시도해주세요.\n조건 : 한글 2자 또는 3자'],
     ['name1','NAME 1','이름 1'],
     ['name2','NAME 2','이름 2'],
@@ -46,14 +45,20 @@ dic = [
     ['nodatamsg','No Data Exists.\nPlease Analysis First.','데이터가 존재하지 않습니다. 먼저 조회해 주세요.'],
     ['duplicateLtoR','Overwrite\nLeft to Right','좌측 항목을\n우측으로 덮기'],
     ['duplicateRtoL','Overwrite\nRight to Left','우측 항목을\n좌측으로 덮기'],
-    ['analysistaketime','Analysis (It May Not Respond Temporarily)','조회하기 (일시적으로 응답하지 않을 수 있습니다)'],
+    ['analysistaketime','Analysis (May Not Respond Temporarily)','조회하기 (일시적으로 응답하지 않을 수 있음)'],
     ['adddialog','Add Dialog','항목 입력'],
     ['entertext','Enter text :','텍스트를 입력하세요 :'],
     ['langsetting','Language Setting','언어 설정'],
     ['langsetnotice','You Need to Restart Program to Update Language.','프로그램을 재시작해야 언어가 변경됩니다.'],
     ['information','Information','정보'],
-    ['resetlist','Clear List','리스트 초기화하기'],
+    ['reset','Reset','초기화'],
+    ['saveascsv','SAVE AS CSV','CSV 파일로 저장']
 ]
+
+indexing = []
+
+for d in dic:
+    indexing.append(d[0])
 
 def translate(tag, lang):
     try:
@@ -63,11 +68,9 @@ def translate(tag, lang):
             langaugeNumber = 2
         else:
             langaugeNumber = None
+        # print('{} -> {}'.format(tag, dic[indexing.index(tag)][langaugeNumber]))
+        return dic[indexing.index(tag)][langaugeNumber]
 
-        for data in dic:
-            if data[0] == tag:
-                # print('[Translator] Translated {} -> {}'.format(tag, data[langaugeNumber]))
-                return data[langaugeNumber]
     except:
         WriteHandledError()
         sys.exit()
