@@ -1271,6 +1271,7 @@ class MainWindow(QWidget):
         self.Tab3analysisButton = Button(Translator.translate('analysistaketime', lang))
         self.Tab3analysisButton.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.Tab3analysisButton.setFixedHeight(37)
+        self.Tab3analysisButton.setStyleSheet('font-size: 12px')
         self.Tab3analysisButton.clicked.connect(self.Tab3ButtonClick)
         self.addRipple(self.Tab3analysisButton)
         self.Tab3analysisButton.setIcon(syncIcon)
