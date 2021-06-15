@@ -1,9 +1,3 @@
-from ast import Interactive
-from email.charset import QP
-from logging import warning
-from sys import argv
-from turtle import width
-from PyQt5 import QtGui
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
@@ -13,25 +7,15 @@ from PyQt5 import QtCore
 import traceback
 import datetime
 
-from os import error, path
-import os
-import json
+from os import path
 import re
 import csv
-import time
 
 import math
 
-from websockets import typing
-
 import DataManager
-# print('Successfully Imported DataManager')
-
 import Translator
-# print('Successfully Imported Translator')
-
 import Hangul
-# print('Successfully Imported Hangul')
 
 try:
     lang = DataManager.ReadData()['lang']
@@ -39,40 +23,52 @@ except:
     lang = 'en'
     DataManager.InitData()
 
-def WriteHandledError():
+def WriteHandledError(external=False):
     filenamae = '[Checker] Error_{}.log'.format(str(datetime.datetime.now()).replace(' ','_').replace(':','-'))
     errormsg = str(traceback.format_exc())
+
+    if 'translate' in errormsg:
+        errorType = 'My Error 101 - Invalid Language Data'
+
+    elif 'lang' in errormsg:
+        errorType = 'My Error 102 - Data Decode Error'
+
+    elif 'invalid start byte' in errormsg:
+        errorType = 'My Error 107 - Invalid Start Byte'
+
+    else:
+        errorType = 'Not Determined'
 
     f = open(filenamae, 'w')
     f.write(errormsg)
     f.close()
 
     alert = QMessageBox()
-    alert.setFont(app.font())
+    if external == False:
+        alert.setFont(app.font())
     alert.setIcon(QMessageBox.Critical)
-    alert.setIconPixmap(QPixmap(errorIcon))
-    alert.setWindowTitle(Translator.translate('error', lang))
-    alert.setWindowIcon(QIcon(iconfilename))
-    alert.setText(Translator.translate('errorlogged', lang).format(filenamae))
+    alert.setIconPixmap(QPixmap(path.abspath(path.join(path.dirname(__file__), 'assets/Warning.svg'))))
+    alert.setWindowTitle('Error Occurred ({})'.format(errorType))
+    alert.setWindowIcon(QIcon(path.abspath(path.join(path.dirname(__file__), 'assets/NewNK.svg'))))
+    alert.setText('{}\n\nError is logged in File :\n{}'.format(errorType, filenamae))
     alert.setDetailedText(errormsg)
     alert.setStandardButtons(QMessageBox.Ok)
     alert.setDefaultButton(QMessageBox.Ok)
     ret = alert.exec_()
 
-errorIcon = path.abspath(path.join(path.dirname(__file__), 'icons/Warning.svg'))
-iconfilename = path.abspath(path.join(path.dirname(__file__), 'icons/NewNK.svg'))
+errorIcon = path.abspath(path.join(path.dirname(__file__), 'assets/Warning.svg'))
+iconfilename = path.abspath(path.join(path.dirname(__file__), 'assets/NewNK.svg'))
 
-# Icons
-syncIcon = QIcon(path.abspath(path.join(path.dirname(__file__), 'icons/Sync.svg')))
-renameIcon = QIcon(path.abspath(path.join(path.dirname(__file__), 'icons/DriveFileRename.svg')))
-warningIcon = QIcon(path.abspath(path.join(path.dirname(__file__), 'icons/WarningYellow.svg')))
-clearIcon = QIcon(path.abspath(path.join(path.dirname(__file__), 'icons/DeleteSweep.svg')))
-saveIcon = QIcon(path.abspath(path.join(path.dirname(__file__), 'icons/SaveAlt.svg')))
-uploadIcon = QIcon(path.abspath(path.join(path.dirname(__file__), 'icons/Upload.svg')))
-publishIcon = QIcon(path.abspath(path.join(path.dirname(__file__), 'icons/Publish.svg')))
+syncIcon = QIcon(path.abspath(path.join(path.dirname(__file__), 'assets/Sync.svg')))
+renameIcon = QIcon(path.abspath(path.join(path.dirname(__file__), 'assets/DriveFileRename.svg')))
+warningIcon = QIcon(path.abspath(path.join(path.dirname(__file__), 'assets/WarningYellow.svg')))
+clearIcon = QIcon(path.abspath(path.join(path.dirname(__file__), 'assets/DeleteSweep.svg')))
+saveIcon = QIcon(path.abspath(path.join(path.dirname(__file__), 'assets/SaveAlt.svg')))
+uploadIcon = QIcon(path.abspath(path.join(path.dirname(__file__), 'assets/Upload.svg')))
+publishIcon = QIcon(path.abspath(path.join(path.dirname(__file__), 'assets/Publish.svg')))
 
-addIcon = QIcon(path.abspath(path.join(path.dirname(__file__), 'icons/Add.svg')))
-delIcon = QIcon(path.abspath(path.join(path.dirname(__file__), 'icons/Remove.svg')))
+addIcon = QIcon(path.abspath(path.join(path.dirname(__file__), 'assets/Add.svg')))
+delIcon = QIcon(path.abspath(path.join(path.dirname(__file__), 'assets/Remove.svg')))
 
 class HoverTracker(QObject):
     positionChanged = pyqtSignal(QPoint)
@@ -105,47 +101,37 @@ class Button(QPushButton):
                 self.fixedPoint = point
             except:
                 self.fixedPoint = self.rect().center()
-        if self.r < self.width() * 1.2:
+        if self.r < self.width():
             self.r += self.width() / 100
+            
         else:
             self.timer.stop()
             self.r = 0
+        
         self.update()
 
     def paintEvent(self, event):
         super().paintEvent(event)
         if self.r:
             qp = QPainter(self)
-            qp.setBrush(QColor(255, 255, 255, 30))
+            qp.setBrush(QColor(255, 255, 255, round(50 * round(self.width() - self.r) / self.width())))
             qp.setPen(Qt.NoPen)
             qp.drawEllipse(self.fixedPoint, self.r, self.r)
 
 class PopUp(QWidget):
     def __init__(self, parent=None):
         super(PopUp, self).__init__(parent, Qt.WindowStaysOnTopHint)
-        # Make Button which shows message
-        self.buton = QPushButton(' {} '.format(Translator.translate(msg, lang)))
+        self.buton = QPushButton(' {}'.format(Translator.translate(msg, lang)))
         self.buton.setIcon(warningIcon)
         self.layout = QHBoxLayout()
         self.layout.addWidget(self.buton)
 
         self.setLayout(self.layout)
-        # No Window Frame
         self.setWindowFlag(Qt.FramelessWindowHint)
-        # Has Translucent Background 
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.show()
-        # Change X and Y with some Values.
         self.move(int(x - (self.width() / 2) + (self.width() / 16)), int(y + (self.height() / 2)))
-
-        self.setStyleSheet("""
-        QPushButton {
-            background: #2F2F2F;
-            color: white;
-            padding: 7px;
-            border-radius: 0px;
-        }
-        """)
+        self.setStyleSheet('QPushButton { background: #2F2F2F; color: white; padding: 7px; border-radius: 0px; }')
 
         self.timer = QTimer()
         self.timer.timeout.connect(self.suicide)
@@ -372,16 +358,16 @@ class MainWindow(QWidget):
 
         self.octocat = QLabel()
         self.octocat.setScaledContents(True)
-        self.octocat.setPixmap(QPixmap(path.abspath(path.join(path.dirname(__file__), 'icons/github.png'))))
-        self.octocat.setFixedSize(64, 64)
+        self.octocat.setPixmap(QPixmap(path.abspath(path.join(path.dirname(__file__), 'assets/github.svg'))))
+        self.octocat.setFixedSize(32, 32)
 
         self.sourceLink = QLabel(Translator.translate('sourcecode', lang).format('<a style="color: #473aff;" href="https://github.com/STR-HK/Knac">','</a>'))
         self.sourceLink.setOpenExternalLinks(True)
 
         self.font = QLabel()
         self.font.setScaledContents(True)
-        self.font.setPixmap(QPixmap(path.abspath(path.join(path.dirname(__file__), 'icons/font.png'))))
-        self.font.setFixedSize(64, 64)
+        self.font.setPixmap(QPixmap(path.abspath(path.join(path.dirname(__file__), 'assets/font.svg'))))
+        self.font.setFixedSize(32, 32)
 
         self.fontsourceLink = QLabel(Translator.translate('font', lang).format('<a style="color: #473aff;" href="https://hangeul.naver.com/font">','</a>'))
         self.fontsourceLink.setOpenExternalLinks(True)
@@ -437,10 +423,14 @@ class MainWindow(QWidget):
         self.QGithub.setLayout(self.Infolayout)
 
     def onLanguageSetted(self, text):
-        if text == self.cb.itemText(0):
-            DataManager.ReplaceData('lang','en')
-        elif text == self.cb.itemText(1):
-            DataManager.ReplaceData('lang','ko')
+        try:
+            if text == self.cb.itemText(0):
+                DataManager.ReplaceData('lang','en')
+            elif text == self.cb.itemText(1):
+                DataManager.ReplaceData('lang','ko')
+        except:
+            WriteHandledError()
+            self.cb.setCurrentIndex(0)
 
     def ChangeMod(self):
         if self.strokeOrder == False:
@@ -697,7 +687,7 @@ class MainWindow(QWidget):
         self.Tab1input2.addAction(renameIcon, QLineEdit.LeadingPosition)
 
         self.Tab1analysisButton = Button(Translator.translate('analysis', lang))
-        self.Tab1analysisButton.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.Tab1analysisButton.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
         self.Tab1analysisButton.setFixedHeight(32)
         self.Tab1analysisButton.clicked.connect(self.Tab1ButtonClick)
         self.addRipple(self.Tab1analysisButton)
@@ -866,28 +856,28 @@ class MainWindow(QWidget):
         self.Tab2layout.setAlignment(Qt.AlignTop)
 
         self.Tab2TXTButton = Button('TXT')
-        self.Tab2TXTButton.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.Tab2TXTButton.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
         self.Tab2TXTButton.setFixedHeight(25)
         self.Tab2TXTButton.clicked.connect(self.Tab2TXTClick)
         self.addRipple(self.Tab2TXTButton)
         self.Tab2TXTButton.setIcon(uploadIcon)
         
         self.Tab2CSVButton = Button('CSV')
-        self.Tab2CSVButton.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.Tab2CSVButton.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
         self.Tab2CSVButton.setFixedHeight(25)
         self.Tab2CSVButton.clicked.connect(self.Tab2CSVClick)
         self.addRipple(self.Tab2CSVButton)
         self.Tab2CSVButton.setIcon(publishIcon)
 
         self.Tab2AddButton = Button('ADD')
-        self.Tab2AddButton.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.Tab2AddButton.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
         self.Tab2AddButton.setFixedHeight(25)
         self.Tab2AddButton.clicked.connect(self.Tab2AddClick)
         self.addRipple(self.Tab2AddButton)
         self.Tab2AddButton.setIcon(addIcon)
 
         self.Tab2RemoveButton = Button('DEL')
-        self.Tab2RemoveButton.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.Tab2RemoveButton.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
         self.Tab2RemoveButton.setFixedHeight(25)
         self.Tab2RemoveButton.clicked.connect(self.Tab2RemoveClick)
         self.addRipple(self.Tab2RemoveButton)
@@ -901,18 +891,18 @@ class MainWindow(QWidget):
         self.Tab2input1.addAction(renameIcon, QLineEdit.LeadingPosition)
 
         self.Tab2input2 = QListWidget()
-        self.Tab2input2.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.Tab2input2.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
         self.Tab2input2.setFixedHeight(128)
 
         self.Tab2analysisButton = Button(Translator.translate('analysis', lang))
-        self.Tab2analysisButton.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.Tab2analysisButton.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
         self.Tab2analysisButton.setFixedHeight(32)
         self.Tab2analysisButton.clicked.connect(self.Tab2ButtonClick)
         self.addRipple(self.Tab2analysisButton)
         self.Tab2analysisButton.setIcon(syncIcon)
 
         self.Tab2ClearAll = Button(Translator.translate('reset', lang))
-        self.Tab2ClearAll.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.Tab2ClearAll.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
         self.Tab2ClearAll.setFixedHeight(32)
         self.Tab2ClearAll.clicked.connect(self.Tab2ClearAllFunc)
         self.addRipple(self.Tab2ClearAll)
@@ -923,14 +913,14 @@ class MainWindow(QWidget):
         self.Tab2Blank2 = QLabel('\n')
 
         self.Tab2SaveAsCSV = Button(Translator.translate('saveascsv', lang))
-        self.Tab2SaveAsCSV.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.Tab2SaveAsCSV.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
         self.Tab2SaveAsCSV.setFixedHeight(27)
         self.Tab2SaveAsCSV.clicked.connect(self.Tab2SaveCSV)
         self.addRipple(self.Tab2SaveAsCSV)
         self.Tab2SaveAsCSV.setIcon(saveIcon)
 
         self.Tab2ClearAllResult = Button(Translator.translate('reset', lang))
-        self.Tab2ClearAllResult.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.Tab2ClearAllResult.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
         self.Tab2ClearAllResult.setFixedHeight(27)
         self.Tab2ClearAllResult.clicked.connect(self.Tab2ClearAllResultFunc)
         self.addRipple(self.Tab2ClearAllResult)
@@ -1155,28 +1145,28 @@ class MainWindow(QWidget):
         self.Vbox2 = QVBoxLayout()
 
         self.Tab3TXTButton1 = Button('TXT 1')
-        self.Tab3TXTButton1.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.Tab3TXTButton1.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
         self.Tab3TXTButton1.setFixedHeight(25)
         self.Tab3TXTButton1.clicked.connect(self.Tab3TXTButton1Click)
         self.addRipple(self.Tab3TXTButton1)
         self.Tab3TXTButton1.setIcon(uploadIcon)
 
         self.Tab3CSVButton1 = Button('CSV 1')
-        self.Tab3CSVButton1.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.Tab3CSVButton1.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
         self.Tab3CSVButton1.setFixedHeight(25)
         self.Tab3CSVButton1.clicked.connect(self.Tab3CSVButton1Click)
         self.addRipple(self.Tab3CSVButton1)
         self.Tab3CSVButton1.setIcon(publishIcon)
 
         self.Tab3AddButton1 = Button('ADD 1')
-        self.Tab3AddButton1.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.Tab3AddButton1.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
         self.Tab3AddButton1.setFixedHeight(25)
         self.Tab3AddButton1.clicked.connect(self.Tab3AddButton1Click)
         self.addRipple(self.Tab3AddButton1)
         self.Tab3AddButton1.setIcon(addIcon)
 
         self.Tab3RemoveButton1 = Button('DEL 1')
-        self.Tab3RemoveButton1.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.Tab3RemoveButton1.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
         self.Tab3RemoveButton1.setFixedHeight(25)
         self.Tab3RemoveButton1.clicked.connect(self.Tab3RemoveButton1Click)
         self.addRipple(self.Tab3RemoveButton1)
@@ -1191,28 +1181,28 @@ class MainWindow(QWidget):
         self.Vbox1.addLayout(self.Hbox15)
 
         self.Tab3TXTButton2 = Button('TXT 2')
-        self.Tab3TXTButton2.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.Tab3TXTButton2.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
         self.Tab3TXTButton2.setFixedHeight(25)
         self.Tab3TXTButton2.clicked.connect(self.Tab3TXTButton2Click)
         self.addRipple(self.Tab3TXTButton2)
         self.Tab3TXTButton2.setIcon(uploadIcon)
 
         self.Tab3CSVButton2 = Button('CSV 2')
-        self.Tab3CSVButton2.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.Tab3CSVButton2.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
         self.Tab3CSVButton2.setFixedHeight(25)
         self.Tab3CSVButton2.clicked.connect(self.Tab3CSVButton2Click)
         self.addRipple(self.Tab3CSVButton2)
         self.Tab3CSVButton2.setIcon(publishIcon)
 
         self.Tab3AddButton2 = Button('ADD 2')
-        self.Tab3AddButton2.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.Tab3AddButton2.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
         self.Tab3AddButton2.setFixedHeight(25)
         self.Tab3AddButton2.clicked.connect(self.Tab3AddButton2Click)
         self.addRipple(self.Tab3AddButton2)
         self.Tab3AddButton2.setIcon(addIcon)
 
         self.Tab3RemoveButton2 = Button('DEL 2')
-        self.Tab3RemoveButton2.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.Tab3RemoveButton2.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
         self.Tab3RemoveButton2.setFixedHeight(25)
         self.Tab3RemoveButton2.clicked.connect(self.Tab3RemoveButton2Click)
         self.addRipple(self.Tab3RemoveButton2)
@@ -1235,24 +1225,24 @@ class MainWindow(QWidget):
         self.GroupBox2.setAlignment(Qt.AlignCenter)
 
         self.Tab3input1 = QListWidget()
-        self.Tab3input1.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.Tab3input1.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
         self.Tab3input1.setFixedHeight(128)
         self.Tab3input2 = QListWidget()
-        self.Tab3input2.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.Tab3input2.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
         self.Tab3input2.setFixedHeight(128)
 
         self.Vbox1.addWidget(self.Tab3input1)
         self.Vbox2.addWidget(self.Tab3input2)
 
         self.Tab3input1ClearAll = Button(Translator.translate('reset', lang))
-        self.Tab3input1ClearAll.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.Tab3input1ClearAll.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
         self.Tab3input1ClearAll.setFixedHeight(27)
         self.Tab3input1ClearAll.clicked.connect(self.Tab3input1ClearAllFunc)
         self.addRipple(self.Tab3input1ClearAll)
         self.Tab3input1ClearAll.setIcon(clearIcon)
 
         self.Tab3input2ClearAll = Button(Translator.translate('reset', lang))
-        self.Tab3input2ClearAll.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.Tab3input2ClearAll.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
         self.Tab3input2ClearAll.setFixedHeight(27)
         self.Tab3input2ClearAll.clicked.connect(self.Tab3input2ClearAllFunc)
         self.addRipple(self.Tab3input2ClearAll)
@@ -1262,14 +1252,14 @@ class MainWindow(QWidget):
         self.Vbox2.addWidget(self.Tab3input2ClearAll)
 
         self.Tab3DuplicateLtoRBox = Button(Translator.translate('duplicateLtoR', lang))
-        self.Tab3DuplicateLtoRBox.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.Tab3DuplicateLtoRBox.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
         self.Tab3DuplicateLtoRBox.setStyleSheet('font-size: 10px')
         self.Tab3DuplicateLtoRBox.setFixedHeight(37)
         self.Tab3DuplicateLtoRBox.clicked.connect(self.DuplicateLtoR)
         self.addRipple(self.Tab3DuplicateLtoRBox)
 
         self.Tab3analysisButton = Button(Translator.translate('analysistaketime', lang))
-        self.Tab3analysisButton.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.Tab3analysisButton.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
         self.Tab3analysisButton.setFixedHeight(37)
         self.Tab3analysisButton.setStyleSheet('font-size: 12px')
         self.Tab3analysisButton.clicked.connect(self.Tab3ButtonClick)
@@ -1277,7 +1267,7 @@ class MainWindow(QWidget):
         self.Tab3analysisButton.setIcon(syncIcon)
 
         self.Tab3DuplicateRtoLBox = Button(Translator.translate('duplicateRtoL', lang))
-        self.Tab3DuplicateRtoLBox.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.Tab3DuplicateRtoLBox.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
         self.Tab3DuplicateRtoLBox.setStyleSheet('font-size: 10px')
         self.Tab3DuplicateRtoLBox.setFixedHeight(37)
         self.Tab3DuplicateRtoLBox.clicked.connect(self.DuplicateRtoL)
@@ -1285,21 +1275,21 @@ class MainWindow(QWidget):
 
         self.Tab3Blank1 = QLabel('\n')
         self.Tab3table = QTableWidget()
-        self.Tab3table.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.Tab3table.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
         self.Tab3Blank2 = QLabel('\n')
 
         self.Tab3ProgressBar = QProgressBar()
         self.Tab3ProgressBar.setValue(0)
 
         self.Tab3SaveAsCSV = Button(Translator.translate('saveascsv', lang))
-        self.Tab3SaveAsCSV.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.Tab3SaveAsCSV.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
         self.Tab3SaveAsCSV.setFixedHeight(27)
         self.Tab3SaveAsCSV.clicked.connect(self.Tab3SaveCSV)
         self.addRipple(self.Tab3SaveAsCSV)
         self.Tab3SaveAsCSV.setIcon(saveIcon)
 
         self.Tab3ClearAllResult = Button(Translator.translate('reset', lang))
-        self.Tab3ClearAllResult.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.Tab3ClearAllResult.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
         self.Tab3ClearAllResult.setFixedHeight(27)
         self.Tab3ClearAllResult.clicked.connect(self.Tab3ClearAllResultFunc)
         self.addRipple(self.Tab3ClearAllResult)
@@ -1624,11 +1614,18 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
 
     fontDB = QFontDatabase()
-    # fontDB.addApplicationFont(path.abspath(path.join(path.dirname(__file__), 'fonts/SDGothicNeoM.ttf')))
+
+    # AppleSDGothicNeoM00 = path.abspath(path.join(path.dirname(__file__), 'fonts/SDGothicNeoM.ttf'))
+    # fontDB.addApplicationFont(AppleSDGothicNeoM00)
     # app.setFont(QFont('AppleSDGothicNeoM00', 11))
 
-    fontDB.addApplicationFont(path.abspath(path.join(path.dirname(__file__), 'fonts/NanumSquareOTF_acB.otf')))
-    app.setFont(QFont('NanumSquareOTF_ac Bold', 11))
+    NanumSquareOTF_ac_Bold = path.abspath(path.join(path.dirname(__file__), 'fonts/NanumSquareOTF_acB.otf'))
+    fontDB.addApplicationFont(NanumSquareOTF_ac_Bold)
+    app.setFont(QFont('NanumSquareOTF_ac Bold', 10))
+
+    # Open_Sans = path.abspath(path.join(path.dirname(__file__), 'fonts/OpenSans-Regular.ttf'))
+    # fontDB.addApplicationFont(Open_Sans)
+    # app.setFont(QFont('Open Sans', 10))
 
     window = MainWindow()
 

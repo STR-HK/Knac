@@ -1,26 +1,4 @@
-from PyQt5.QtWidgets import QMessageBox
-from PyQt5.QtGui import QIcon
-import traceback
-import datetime
 import sys
-
-def WriteHandledError():
-    filenamae = '[Checker] Error_{}.log'.format(str(datetime.datetime.now()).replace(' ','_').replace(':','-'))
-    errormsg = str(traceback.format_exc())
-
-    f = open(filenamae, 'w')
-    f.write(errormsg)
-    f.close()
-
-    alert = QMessageBox()
-    alert.setIcon(QMessageBox.Critical)
-    alert.setWindowTitle(translate('error', 'en'))
-    alert.setWindowIcon(QIcon('icons/NK.png'))
-    alert.setText('❰ CheckerData.ini {\"lang\"} Error ❱\n\n' + translate('errorlogged', 'en').format(filenamae))
-    alert.setDetailedText(errormsg)
-    alert.setStandardButtons(QMessageBox.Ok)
-    alert.setDefaultButton(QMessageBox.Ok)
-    ret = alert.exec_()
 
 dic = [
     ['error','Error Occurred','에러 발생'],
@@ -32,7 +10,7 @@ dic = [
     ['notsupported','Not Supported','지원되지 않음'],
     ['notsupportedshortcutonthistaberror','Not Supported Shortcut in this Tab.\nUse {} and {} to Interact Each Box.', '이 탭에서는 지원되지 않는 단축키입니다.\n{}과 {}을 이용해 각 객체들과 상호작용하세요.'],
     ['sourcecode','Source Code : {}Repository Link{}','소스 코드 : {}레포지토리 링크{}'],
-    ['font','Font [NanumSquareOTF ac Bold] : {}Site Link{}','글꼴 [나눔스퀘어 ac Bold] : {}사이트 링크{}'],
+    ['font','Font : [NanumSquareOTF ac Bold] {}Site Link{}','글꼴 : [나눔스퀘어 ac Bold] {}사이트 링크{}'],
     ['calculateway','Calculate Way Settings','계산 방법 설정'],
     ['bylineorder','By Line Number', '선의 개수로'],
     ['bystrokeorder','By Stroke Order','획의 순서대로'],
@@ -72,5 +50,6 @@ def translate(tag, lang):
         return dic[indexing.index(tag)][langaugeNumber]
 
     except:
-        WriteHandledError()
+        from Checker_GUI import WriteHandledError
+        WriteHandledError(external=True)
         sys.exit()
