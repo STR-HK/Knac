@@ -1,7 +1,8 @@
 # [Knac] Korean Name Compatibility Checker GUI
 
 ## Develop Period
-2021/02/09 ~ 2021/02/17 , 2021/04/23 ~ 2021/04/25 , 2021/04/29 , 2021/05/01
+First : 2021/02/09 ~ 2021/02/17
+Upgrade : 2021/04/23 ~ 2021/05/01 ~
 
 ## KeyBoard Shortcuts
 
